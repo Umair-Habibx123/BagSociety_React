@@ -68,3 +68,16 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+
+
+
+<!-- in my checkout page, 
+1. show saved card in radio buttons.
+2. and in last radio button show " add new card"
+3. if a card radio selected, procedd to paymnet with that card.
+4. and if "add new card" radio selected show add new card ui
+
+
+my payment page. it save card details in firebase firestore. also show in ui saved cards. -->

@@ -1,38 +1,16 @@
-.App {
-  text-align: center;
+.whatsapp-icon {
+  position: fixed;
+  bottom: 30px; /* Adjusted bottom position */
+  right: 30px; /* Adjusted right position */
+  z-index: 1000; /* Ensure it's above other content */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.whatsapp-icon-img {
+  font-size: 60px; /* Increased size of the icon */
+  color: white; /* Hover color */
+  background-color: #25d366; /* Hover background color */
+  border-radius: 50%; /* Makes the background circular */
+  padding: 15px; /* Increased padding to make icon more clickable */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow for more prominence */
+  font-weight: bold; /* Making the icon bolder */
 }
