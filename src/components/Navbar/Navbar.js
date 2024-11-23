@@ -136,7 +136,7 @@ function Navbar() {
                   to="/MyPayments"
                 >
                   <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
-                    Payments
+                    Saved Payments Methods
                   </button>
                 </Link>
                 <button
@@ -231,7 +231,7 @@ function Navbar() {
                     <button
                       className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
                     >
-                      Payments
+                      Saved Payments Methods
                     </button>
                   </Link>
                   <button

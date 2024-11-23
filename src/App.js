@@ -16,6 +16,7 @@ import PaymentPage from './components/Settings/payment';
 import OrderList from './components/Settings/myorders';
 import UserDetails from './components/Settings/UserDetails';
 import AddAddressPage from './components/Settings/AddAddressPage';
+import BuyNowPage from './components/BuyNow/BuyNowPage';
 
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -97,6 +98,14 @@ function App() {
             <Route path="/add-address" element={
               <>
                 <AddAddressPage /> {/* cart page */}
+              </>
+            } />
+
+            <Route path="/BuyNow" element={
+              <>
+                <Elements stripe={stripePromise}>
+                  <BuyNowPage /> {/* cart page */}
+                </Elements>
               </>
             } />
 

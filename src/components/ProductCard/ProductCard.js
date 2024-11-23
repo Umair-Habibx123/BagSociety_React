@@ -1,21 +1,29 @@
 import React, { useState } from "react";
 import { db } from "../../firebase";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useUser } from "../../context/UserContext"; // Assuming you have a context for the user
+import { Link, useNavigate } from "react-router-dom"; // Importing useNavigate for programmatic navigation
 
 const ProductCard = ({ product }) => {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false); // State for the login prompt modal
   const [added, setAdded] = useState(false);
-  const user = useUser(); // Get the logged-in user from context
+  const userContext = useUser(); // Get the logged-in user from context
+  const [profilePic, setProfilePic] = useState("/default-profile.png"); // Default profile picture
+  const [userState, setUserState] = useState(null); // User state to manage logged-in user info
+
+  const auth = getAuth();
+  const provider = new GoogleAuthProvider();
+  const navigate = useNavigate(); // Initialize the useNavigate hook
 
   const handleAddToCart = async () => {
-    if (!user) {
+    if (!userContext) {
       setShowLoginPrompt(true); // Show login prompt modal if not logged in
       return;
     }
 
     try {
-      const cartRef = doc(db, "userCart", user.uid);
+      const cartRef = doc(db, "userCart", userContext.uid);
       const cartDoc = await getDoc(cartRef);
 
       let updatedCart = [];
@@ -24,7 +32,7 @@ const ProductCard = ({ product }) => {
       }
 
       // Add item to cart
-      updatedCart.push({ id: product.id, title: product.title, price: product.discountedPrice, image:product.image });
+      updatedCart.push({ id: product.id, title: product.title, price: product.discountedPrice, image: product.image });
 
       // Update cart in Firestore
       await setDoc(cartRef, { items: updatedCart });
@@ -33,6 +41,46 @@ const ProductCard = ({ product }) => {
     } catch (error) {
       console.error("Error adding to cart: ", error);
     }
+  };
+
+  // Handle Google sign-in
+  const handleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if the user already exists in Firestore (based on their email)
+      const userDocRef = doc(db, "users", user.email); // Firestore document for the user using their email
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (!userDocSnap.exists()) {
+        // If user document doesn't exist, create a new document for the user
+        await setDoc(userDocRef, {
+          username: user.displayName,
+          email: user.email,
+          profilePic: user.photoURL || "/default-profile.png", // Default image if none exists
+        });
+        setProfilePic(user.photoURL || "/default-profile.png"); // Update profile picture
+      } else {
+        // If user document exists, load existing data
+        const userData = userDocSnap.data();
+        setProfilePic(userData.profilePic || "/default-profile.png"); // Use stored profile picture
+      }
+
+      setUserState(user); // Set the user state after successful login
+    } catch (error) {
+      console.error("Error logging in with Google:", error);
+    }
+  };
+
+  const handleBuyNow = () => {
+    if (!userContext) {
+      setShowLoginPrompt(true); // Show login prompt modal if not logged in
+      return;
+    }
+
+    // Navigate to the Buy Now page with the product details
+    navigate("/BuyNow", { state: { product } });
   };
 
   return (
@@ -93,6 +141,7 @@ const ProductCard = ({ product }) => {
               <button
                 onClick={() => {
                   setShowLoginPrompt(false);
+                  handleSignIn();
                   // Redirect to login page (replace with your login logic)
                 }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -104,7 +153,10 @@ const ProductCard = ({ product }) => {
         )}
 
         {/* Buy Now Button */}
-        <button className="w-full py-2 border border-blue-600 text-blue-600 text-sm font-medium rounded-md bg-white hover:bg-blue-50">
+        <button 
+          onClick={handleBuyNow}
+          className="w-full py-2 border border-blue-600 text-blue-600 text-sm font-medium rounded-md bg-white hover:bg-blue-50"
+        >
           Buy Now
         </button>
       </div>

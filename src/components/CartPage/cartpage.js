@@ -192,7 +192,6 @@ const CartPage = () => {
                         </button>
                     </Link>
 
-
                 </div>
             </div>
         </div>

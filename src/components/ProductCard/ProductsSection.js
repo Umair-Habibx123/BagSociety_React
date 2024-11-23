@@ -19,15 +19,6 @@ const ProductsSection = () => {
           ...doc.data(),
         }));
 
-        //   // Sort products ascending based on the document ID (e.g., product1, product2)
-        //   const sortedProducts = productsList.sort((a, b) => {
-        //     const idA = a.id.replace(/[^0-9]/g, ''); // Extract the numeric part of the ID
-        //     const idB = b.id.replace(/[^0-9]/g, ''); // Extract the numeric part of the ID
-        //     return parseInt(idA) - parseInt(idB); // Sort numerically
-        //   });
-
-        //   setProducts(sortedProducts); // Set the sorted products state
-        // } 
 
         // Sort products descending based on the document ID in descending order (e.g., product10, product9, ..., product1)
         const sortedProducts = productsList.sort((a, b) => {
