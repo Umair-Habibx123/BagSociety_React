@@ -9,6 +9,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "autoprefixer": "^10.4.20",
+    "emailjs-com": "^3.2.0",
     "firebase": "^11.0.2",
     "material-icons": "^1.13.12",
     "postcss": "^8.4.49",

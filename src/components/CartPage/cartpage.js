@@ -42,29 +42,26 @@ const CartPage = () => {
         }
     };
 
+
     const handleQuantityChange = async (itemId, change) => {
         if (!currentUser) return;
 
+        const updatedCart = cart.map((item) =>
+            item.id === itemId
+                ? { ...item, quantity: Math.max(1, (item.quantity || 1) + change) }
+                : item
+        );
+
         try {
             const cartRef = doc(db, "userCart", currentUser.uid);
-            const cartDoc = await getDoc(cartRef);
-
-            if (cartDoc.exists()) {
-                const currentItems = cartDoc.data().items || [];
-                const updatedItems = currentItems.map((item) =>
-                    item.id === itemId
-                        ? { ...item, quantity: Math.max(1, (item.quantity || 1) + change) }
-                        : item
-                );
-
-                await setDoc(cartRef, { items: updatedItems });
-                setCart(updatedItems);
-                calculateTotalPrice(updatedItems, selectedItems);
-            }
+            await setDoc(cartRef, { items: updatedCart });
+            setCart(updatedCart);
+            calculateTotalPrice(updatedCart, selectedItems);
         } catch (error) {
             console.error("Error updating item quantity:", error);
         }
     };
+
 
     const handleItemSelect = (itemId) => {
         setSelectedItems((prevSelectedItems) =>

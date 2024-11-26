@@ -129,16 +129,7 @@ function Navbar() {
                     View Profile
                   </button>
                 </Link>
-                {/* <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
-                  My Orders
-                </button> */}
-                <Link
-                  to="/MyPayments"
-                >
-                  <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
-                    Saved Payments Methods
-                  </button>
-                </Link>
+
                 <button
                   onClick={() => {
                     auth.signOut();
@@ -215,25 +206,6 @@ function Navbar() {
                     </button>
                   </Link>
 
-                  {/* <Link
-                        to="/MyOrders"
-                    >
-                  <button
-                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
-                  >
-                    My Orders
-                  </button>
-                  </Link> */}
-
-                  <Link
-                    to="/MyPayments"
-                  >
-                    <button
-                      className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
-                    >
-                      Saved Payments Methods
-                    </button>
-                  </Link>
                   <button
                     onClick={() => {
                       auth.signOut();

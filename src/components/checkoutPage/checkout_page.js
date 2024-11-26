@@ -2,13 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
-import { db } from "../../firebase"; // Adjust the path to your Firebase config file
-import { useUser } from "../../context/UserContext"; // Adjust the path to your context
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from '@stripe/react-stripe-js';
-
-const stripePromise = loadStripe("pk_test_51QOCsjG75TGzEhkJZOpAO9uh6tnI7wWD64rJoxEqx9y6DZGmiTOPBWvmVuMs5ABGUVdU5GvOsDvGT51aAG196r1S008d0El8NR");
+import { db } from "../../firebase";
+import emailjs from "emailjs-com";
 
 const CheckoutPage = () => {
     const location = useLocation();
@@ -19,7 +14,7 @@ const CheckoutPage = () => {
     const [total, setTotal] = useState(totalAmount || 0);
     const [address, setAddress] = useState(null);
     const [isAddressLoading, setIsAddressLoading] = useState(true);
-    const [isAddressFormVisible, setIsAddressFormVisible] = useState(false); // For toggling the address form visibility
+    const [isAddressFormVisible, setIsAddressFormVisible] = useState(false);
     const [newAddress, setNewAddress] = useState({
         country: '',
         firstName: '',
@@ -30,17 +25,7 @@ const CheckoutPage = () => {
         postalCode: '',
         phone: ''
     });
-
-    const [cardToken, setCardToken] = useState(null);
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [savedCards, setSavedCards] = useState([]);
-    const [selectedCard, setSelectedCard] = useState(null);
-
-    const stripe = useStripe();
-    const elements = useElements();
-
-    const user = useUser();
-
+    const [paymentMethod, setPaymentMethod] = useState("cash");
 
     useEffect(() => {
         if (!selectedItems || selectedItems.length === 0) {
@@ -68,21 +53,17 @@ const CheckoutPage = () => {
                         if (docSnap.exists()) {
                             const data = docSnap.data();
                             setAddress(data.address || null);
-                            setSavedCards(data.savedCards || []);
                         } else {
                             setAddress(null);
-                            setSavedCards([]);
                         }
                     } catch (error) {
                         console.error("Error fetching address:", error);
                         setAddress(null);
-                        setSavedCards([]);
                     } finally {
                         setIsAddressLoading(false);
                     }
                 })();
             } else {
-                console.error("No user logged in");
                 navigate("/login");
             }
         });
@@ -120,15 +101,19 @@ const CheckoutPage = () => {
 
         try {
             const auth = getAuth();
-            const userEmail = auth.currentUser.email;
-            const userRef = doc(db, "users", userEmail);
+            const userEmail = auth.currentUser?.email;
 
-            const formattedAddress = `${newAddress.firstName} ${newAddress.lastName}, ${newAddress.address}, ${newAddress.apartment}, ${newAddress.city}, ${newAddress.country}, ${newAddress.postalCode}, Phone: ${newAddress.phone}`;
+            if (!userEmail) {
+                alert("User is not authenticated.");
+                return;
+            }
+
+            const userRef = doc(db, "users", userEmail);
             await setDoc(userRef, {
-                address: formattedAddress
+                address: newAddress
             }, { merge: true });
 
-            setAddress(formattedAddress);
+            setAddress(newAddress);
             setIsAddressFormVisible(false);
             alert("Address saved successfully!");
         } catch (error) {
@@ -137,105 +122,104 @@ const CheckoutPage = () => {
         }
     };
 
-
-
-    const handleCardSubmit = async (event) => {
-        event.preventDefault();
-
-        if (!stripe || !elements) {
-            console.error("Stripe or Elements not loaded yet");
+    const handleCheckout = async () => {
+        if (!address) {
+            alert("Please provide a valid shipping address.");
             return;
         }
 
-        setIsProcessing(true);
-
-        const card = elements.getElement(CardElement);
-        if (!card) {
-            console.error("CardElement is not rendered properly.");
-            setIsProcessing(false);
-            return;
-        }
-
-        const { token, error } = await stripe.createToken(card);
-
-        if (error) {
-            console.error("Error creating token:", error);
-            setIsProcessing(false);
+        if (!selectedItems || selectedItems.length === 0) {
+            alert("No items selected for checkout.");
             return;
         }
 
         try {
             const auth = getAuth();
-            const userEmail = auth.currentUser.email;
+            const user = auth.currentUser;
+
+            if (!user) {
+                alert("User is not authenticated.");
+                return;
+            }
+
+            // Fetch user details if needed (e.g., username)
+            const userEmail = user.email;
             const userRef = doc(db, "users", userEmail);
+            const userDoc = await getDoc(userRef);
 
-            const last4 = token.card.last4;
+            const username = userDoc.exists() ? userDoc.data().username : "Unknown User";
 
-            await setDoc(
-                userRef,
-                {
-                    paymentToken: token.id,
-                    savedCards: [
-                        ...savedCards,
-                        { token: token.id, last4 }
-                    ]
+            // Prepare order data
+            const orderData = {
+                user: {
+                    email: userEmail || "Unknown user",
+                    username: username || "Unnamed user",
+                    address: address || "Address not provided",
                 },
-                { merge: true }
+                items: selectedItems.map((item) => ({
+                    id: item.id || "N/A",
+                    name: item.name || "Unnamed item",
+                    price: parseFloat(item.price) || 0,
+                    quantity: item.quantity || 1,
+                })),
+                subtotal: parseFloat(subtotal) || 0,
+                shippingFee: parseFloat(shippingFee) || 0,
+                total: parseFloat(total) || 0,
+                paymentMethod: paymentMethod || "cash",
+                status: "Pending",
+                createdAt: new Date().toISOString(),
+            };
+
+            console.log("Order data being saved:", orderData); // Debugging log
+
+            // Save order to Firestore
+            const ordersRef = doc(db, "orders", `${userEmail}_${Date.now()}`);
+            await setDoc(ordersRef, orderData);
+
+            // Prepare email content
+            const emailContent = `
+                <h1>Order Confirmation</h1>
+                <p><strong>User:</strong> ${username} (${userEmail})</p>
+                <p><strong>Shipping Address:</strong></p>
+                <pre>${JSON.stringify(address, null, 2)}</pre>
+                <p><strong>Order Summary:</strong></p>
+                <ul>
+                    ${selectedItems
+                    .map(
+                        (item) =>
+                            `<li>${item.name} - $${item.price.toFixed(2)} x ${item.quantity}</li>`
+                    )
+                    .join("")}
+                </ul>
+                <p><strong>Subtotal:</strong> $${subtotal.toFixed(2)}</p>
+                <p><strong>Shipping Fee:</strong> $${shippingFee.toFixed(2)}</p>
+                <p><strong>Total:</strong> $${total.toFixed(2)}</p>
+                <p><strong>Payment Method:</strong> ${paymentMethod}</p>
+                <p><strong>Status:</strong> ${orderData.status}</p>
+            `;
+
+            // Send confirmation email
+            await emailjs.send(
+                "service_wng6lvv", // Replace with your service ID
+                "template_zmbrbjb", // Replace with your template ID
+                {
+                    to_email: "umairhabibabc@gmail.com", // Recipient's email
+                    user_email: userEmail, // User's email
+                    username: username, // User's name
+                    order_details: emailContent, // Order details in HTML format
+                },
+                "kkvWuOpN6HHfFs475" // Replace with your EmailJS user ID
             );
 
-            setCardToken(token.id);
-            setSavedCards((prevCards) => [...prevCards, { token: token.id, last4 }]);
-            console.log("Card token saved successfully.");
-            alert("Card added successfully!");
+            alert("Order placed successfully!");
+            navigate("/order-confirmation", { state: { orderData } });
         } catch (error) {
-            console.error("Error saving token:", error);
-            alert("Failed to save card.");
-        } finally {
-            setIsProcessing(false);
+            console.error("Error processing checkout:", error);
+            alert("Failed to place the order. Please try again.");
         }
     };
 
-    const handleCardSelection = (cardToken) => {
-        setSelectedCard(cardToken);
-    };
 
-    const handleCheckout = async () => {
-        if (!stripe || !elements) {
-            console.error("Stripe or Elements not loaded yet");
-            return;
-        }
-
-        setIsProcessing(true);
-
-        try {
-            // Call your backend to create the payment intent
-            const response = await fetch("/create-payment-intent", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: total }),
-            });
-
-            const { clientSecret } = await response.json();
-
-            const result = await stripe.confirmCardPayment(clientSecret, {
-                payment_method: selectedCard || cardToken
-            });
-
-            if (result.error) {
-                console.error("Payment failed:", result.error.message);
-                alert("Payment failed, please try again.");
-            } else if (result.paymentIntent.status === "succeeded") {
-                console.log("Payment successful!");
-                alert("Payment successful!");
-                navigate("/thank-you");
-            }
-        } catch (error) {
-            console.error("Error during checkout:", error);
-            alert("There was an issue processing your payment. Please try again.");
-        } finally {
-            setIsProcessing(false);
-        }
-    };
 
 
     return (
@@ -270,110 +254,28 @@ const CheckoutPage = () => {
                     </div>
                 </div>
 
-                {/* Address Form - Show if isAddressFormVisible is true */}
+                {/* Address Form */}
                 {isAddressFormVisible && (
                     <div className="mb-6">
                         <h3 className="text-lg font-semibold text-gray-700 mb-2">Enter New Address</h3>
                         <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm text-gray-700">Country/Region</label>
-                                <select
-                                    name="country"
-                                    value={newAddress.country}
-                                    onChange={handleAddressInputChange}
-                                    className="w-full p-2 border rounded-lg"
-                                >
-                                    <option value="">Select Country</option>
-                                    {/* Add country options */}
-                                    <option value="USA">USA</option>
-                                    <option value="Canada">Canada</option>
-                                </select>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="flex-1">
-                                    <label className="block text-sm text-gray-700">First Name</label>
-                                    <input
-                                        type="text"
-                                        name="firstName"
-                                        value={newAddress.firstName}
-                                        onChange={handleAddressInputChange}
-                                        className="w-full p-2 border rounded-lg"
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <label className="block text-sm text-gray-700">Last Name</label>
-                                    <input
-                                        type="text"
-                                        name="lastName"
-                                        value={newAddress.lastName}
-                                        onChange={handleAddressInputChange}
-                                        className="w-full p-2 border rounded-lg"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-700">Street Address</label>
-                                <input
-                                    type="text"
-                                    name="address"
-                                    value={newAddress.address}
-                                    onChange={handleAddressInputChange}
-                                    className="w-full p-2 border rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-700">Apartment, suite, etc. (optional)</label>
-                                <input
-                                    type="text"
-                                    name="apartment"
-                                    value={newAddress.apartment}
-                                    onChange={handleAddressInputChange}
-                                    className="w-full p-2 border rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-700">City</label>
-                                <input
-                                    type="text"
-                                    name="city"
-                                    value={newAddress.city}
-                                    onChange={handleAddressInputChange}
-                                    className="w-full p-2 border rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-700">Postal Code</label>
-                                <input
-                                    type="text"
-                                    name="postalCode"
-                                    value={newAddress.postalCode}
-                                    onChange={handleAddressInputChange}
-                                    className="w-full p-2 border rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-700">Phone Number</label>
-                                <input
-                                    type="text"
-                                    name="phone"
-                                    value={newAddress.phone}
-                                    onChange={handleAddressInputChange}
-                                    className="w-full p-2 border rounded-lg"
-                                />
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={handleSaveAddress}
-                                className="bg-blue-600 text-white p-2 rounded-lg mt-4 w-full"
-                            >
+                            <input
+                                type="text"
+                                name="address"
+                                value={newAddress.address}
+                                onChange={handleAddressInputChange}
+                                className="form-field"
+                                placeholder="Enter your address"
+                            />
+                            <button onClick={handleSaveAddress} className="save-btn">
                                 Save Address
                             </button>
                         </div>
+
                     </div>
                 )}
 
-                {/* Checkout Summary */}
+                {/* Order Summary */}
                 <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">Order Summary</h3>
                     <div className="bg-gray-100 p-4 rounded-lg">
@@ -383,23 +285,29 @@ const CheckoutPage = () => {
                     </div>
                 </div>
 
-                {/* Stripe Payment Form */}
-                <form onSubmit={handleCardSubmit} className="mb-6">
-                    <CardElement className="p-4 border rounded-lg" />
-                    <button
-                        type="submit"
-                        disabled={isProcessing || !stripe || !elements}
-                        className="w-full bg-blue-600 text-white p-2 rounded-lg mt-4"
-                    >
-                        {isProcessing ? 'Processing...' : 'Add Card and Proceed'}
-                    </button>
-                </form>
+                {/* Payment Method */}
+                <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Payment Method</h3>
+                    <div>
+                        <label className="flex items-center">
+                            <input
+                                type="radio"
+                                name="paymentMethod"
+                                value="cash"
+                                checked={paymentMethod === "cash"}
+                                onChange={(e) => setPaymentMethod(e.target.value)}
+                                className="mr-2"
+                            />
+                            Cash on Delivery
+                        </label>
+                    </div>
+                </div>
 
                 <button
                     onClick={handleCheckout}
                     className="w-full bg-green-600 text-white p-2 rounded-lg mt-4"
                 >
-                    Proceed to Checkout
+                    Place Order
                 </button>
             </div>
         </div>
@@ -407,4 +315,3 @@ const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
-

@@ -17,6 +17,7 @@ import OrderList from './components/Settings/myorders';
 import UserDetails from './components/Settings/UserDetails';
 import AddAddressPage from './components/Settings/AddAddressPage';
 import BuyNowPage from './components/BuyNow/BuyNowPage';
+import OrderConfirmationPage from './components/OrderConfirmation/OrderConfirmationPage';
 
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -108,6 +109,9 @@ function App() {
                 </Elements>
               </>
             } />
+
+            <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+
 
           </Routes>
 
