@@ -7,6 +7,8 @@ const ContactUsForm = () => {
         message: ''
     });
 
+    const [showModal, setShowModal] = useState(false); // To control the modal visibility
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -31,7 +33,7 @@ const ContactUsForm = () => {
         })
             .then((response) => {
                 if (response.ok) {
-                    alert('Your message has been sent successfully!');
+                    setShowModal(true); // Show the modal on success
                 } else {
                     alert('There was an error sending your message.');
                 }
@@ -108,6 +110,24 @@ const ContactUsForm = () => {
                     </div>
                 </form>
                 {/* Form End */}
+
+                {/* Modal Dialog */}
+                {showModal && (
+                    <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50">
+                        <div className="bg-white p-6 rounded-md shadow-lg max-w-sm w-full">
+                            <h2 className="text-xl font-semibold text-gray-800 mb-4">Thanks for contacting us!</h2>
+                            <p className="text-gray-600">We appreciate you reaching out. Our team will get back to you shortly.</p>
+                            <div className="mt-6 text-center">
+                                <button
+                                    onClick={() => setShowModal(false)} 
+                                    className="py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </section>
     );

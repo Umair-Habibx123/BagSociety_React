@@ -15,35 +15,38 @@ function Navbar() {
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
 
-  // Handle Google sign-in
+
   const handleSignIn = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+      const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
+      const user = result.user; // Get the logged-in user
 
-      // Check if the user already exists in Firestore (based on their email)
-      const userDocRef = doc(db, "users", user.email); // Firestore document for the user using their email
+      // Reference to the user's document in Firestore using their email
+      const userDocRef = doc(db, "users", user.email);
+
+      // Check if the user's document already exists
       const userDocSnap = await getDoc(userDocRef);
 
-      if (!userDocSnap.exists()) {
-        // If user document doesn't exist, create a new document for the user
+      if (userDocSnap.exists()) {
+        // If the user document exists, load existing data
+        const userData = userDocSnap.data();
+        setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
+      } else {
+        // If the user document doesn't exist, create a new one
         await setDoc(userDocRef, {
           username: user.displayName,
           email: user.email,
-          profilePic: user.photoURL || "/default-profile.png", // Default image if none exists
+          profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
         });
-        setProfilePic(user.photoURL || "/default-profile.png"); // Update profile picture
-      } else {
-        // If user document exists, load existing data
-        const userData = userDocSnap.data();
-        setProfilePic(userData.profilePic || "/default-profile.png"); // Use stored profile picture
+        setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
       }
 
-      setUser(user); // Set the user state after successful login
+      setUser(user); // Update the user state with the logged-in user's info
     } catch (error) {
       console.error("Error logging in with Google:", error);
     }
   };
+
 
   // Listen for authentication state changes (check if the user is logged in or not)
   useEffect(() => {
@@ -71,12 +74,14 @@ function Navbar() {
       <div className="w-full px-4 py-4 flex justify-between items-center">
         {/* Logo */}
         <div className="flex items-center whitespace-nowrap">
-          <img
-            src={image1} // Replace with your actual image source
-            alt="BAG SOCIETY Logo"
-            className="w-12 h-12 mr-2"
-          />
-          <span className="text-white text-2xl font-bold">BAG SOCIETY</span>
+          <Link to="/" className="flex items-center">
+            <img
+              src={image1} // Replace with your actual image source
+              alt="BAG SOCIETY Logo"
+              className="w-12 h-12 mr-2"
+            />
+            <span className="text-white text-2xl font-bold">BAG SOCIETY</span>
+          </Link>
         </div>
 
         {/* Hamburger Menu for Mobile */}
@@ -127,6 +132,16 @@ function Navbar() {
                 >
                   <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
                     View Profile
+                  </button>
+                </Link>
+
+                <Link
+                  to="/MyOrders"
+                >
+                  <button
+                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
+                  >
+                    My Orders
                   </button>
                 </Link>
 
@@ -206,16 +221,28 @@ function Navbar() {
                     </button>
                   </Link>
 
+                  <Link
+                    to="/MyOrders"
+                  >
+                    <button
+                      className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
+                    >
+                      My Orders
+                    </button>
+                  </Link>
+
                   <button
                     onClick={() => {
-                      auth.signOut();
+                      auth.signOut(); // Sign out from auth
                       setUser(null); // Set user state to null when logging out
                       setIsDropdownOpen(false); // Close the dropdown
+                      window.location.reload(); // Refresh the page to clear any remaining data
                     }}
                     className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
                   >
                     Logout
                   </button>
+
                 </div>
               )}
             </div>

@@ -15,6 +15,8 @@ import SettingsPage from './components/Settings/setting';
 import UserDetails from './components/Settings/UserDetails';
 import AddAddressPage from './components/Settings/AddAddressPage';
 import BuyNowPage from './components/BuyNow/BuyNowPage';
+import ProductDetail from "./components/ProductCard/productDetails";
+import MyOrdersPage from './components/MyOrders/myorders';
 import OrderConfirmationPage from './components/OrderConfirmation/OrderConfirmationPage';
 
 function App() {
@@ -41,6 +43,14 @@ function App() {
               </>
             } />
 
+            {/* Product Detail Page */}
+            <Route path="/product/:id" element={
+              <>
+                <ProductDetail /> {/* Displays detailed view of the selected product */}
+              </>
+            } />
+
+
             <Route path="/my-cart" element={
               <>
                 <CartPage /> {/* cart page */}
@@ -55,7 +65,7 @@ function App() {
 
             <Route path="/checkout" element={
               <>
-                  <CheckoutPage /> {/* cart page */}
+                <CheckoutPage /> {/* cart page */}
               </>
             } />
 
@@ -77,9 +87,15 @@ function App() {
               </>
             } />
 
+            <Route path="/MyOrders" element={
+              <>
+                <MyOrdersPage /> {/* cart page */}
+              </>
+            } />
+
             <Route path="/BuyNow" element={
               <>
-                  <BuyNowPage /> {/* cart page */}
+                <BuyNowPage /> {/* cart page */}
               </>
             } />
 

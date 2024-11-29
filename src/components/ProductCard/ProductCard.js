@@ -16,7 +16,8 @@ const ProductCard = ({ product }) => {
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate(); // Initialize the useNavigate hook
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (e) => {
+    e.stopPropagation(); // Prevents the click event from reaching the card
     if (!userContext) {
       setShowLoginPrompt(true); // Show login prompt modal if not logged in
       return;
@@ -73,7 +74,8 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = (e) => {
+    e.stopPropagation(); // Prevents the click event from reaching the card
     if (!userContext) {
       setShowLoginPrompt(true); // Show login prompt modal if not logged in
       return;
@@ -82,6 +84,11 @@ const ProductCard = ({ product }) => {
     // Navigate to the Buy Now page with the product details
     navigate("/BuyNow", { state: { product } });
   };
+
+  const handleCardClick = () => {
+    navigate(`/product/${product.id}`, { state: { product } }); // Navigates to product detail
+  };
+
 
   return (
     <div className="border border-gray-300 rounded-lg p-4 shadow-sm relative bg-white">
@@ -92,6 +99,7 @@ const ProductCard = ({ product }) => {
 
       {/* Product Image */}
       <img
+        onClick={handleCardClick}
         src={product.image}
         alt={product.title}
         className="w-full h-48 object-cover rounded-md"
@@ -153,7 +161,7 @@ const ProductCard = ({ product }) => {
         )}
 
         {/* Buy Now Button */}
-        <button 
+        <button
           onClick={handleBuyNow}
           className="w-full py-2 border border-blue-600 text-blue-600 text-sm font-medium rounded-md bg-white hover:bg-blue-50"
         >

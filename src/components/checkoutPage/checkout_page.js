@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "../../firebase";
 import emailjs from "emailjs-com";
@@ -10,7 +10,7 @@ const CheckoutPage = () => {
     const navigate = useNavigate();
     const { selectedItems, totalAmount } = location.state || {};
     const [subtotal, setSubtotal] = useState(0);
-    const [shippingFee, setShippingFee] = useState(1.99);
+    // const [shippingFee, setShippingFee] = useState(1.99);
     const [total, setTotal] = useState(totalAmount || 0);
     const [address, setAddress] = useState(null);
     const [isAddressLoading, setIsAddressLoading] = useState(true);
@@ -26,6 +26,8 @@ const CheckoutPage = () => {
         phone: ''
     });
     const [paymentMethod, setPaymentMethod] = useState("cash");
+    const [isLoading, setIsLoading] = useState(false); // Loading state for checkout process
+
 
     useEffect(() => {
         if (!selectedItems || selectedItems.length === 0) {
@@ -36,9 +38,11 @@ const CheckoutPage = () => {
                 return acc + (isNaN(price) ? 0 : price * (item.quantity || 1));
             }, 0);
             setSubtotal(newSubtotal);
-            setTotal(newSubtotal + shippingFee);
+            // setTotal(newSubtotal + shippingFee);
+            setTotal(newSubtotal);
         }
-    }, [selectedItems, shippingFee, navigate]);
+        // }, [selectedItems, shippingFee, navigate]);
+    }, [selectedItems, navigate]);
 
     useEffect(() => {
         const auth = getAuth();
@@ -94,26 +98,42 @@ const CheckoutPage = () => {
     };
 
     const handleSaveAddress = async () => {
-        if (!newAddress.firstName || !newAddress.lastName || !newAddress.address || !newAddress.city || !newAddress.postalCode || !newAddress.phone) {
-            alert("Please fill in all required fields.");
+        // Validation: Check if all fields are filled
+        const {
+            country,
+            firstName,
+            lastName,
+            address,
+            apartment,
+            city,
+            postalCode,
+            phone,
+        } = newAddress;
+
+        if (
+            !country ||
+            !firstName.trim() ||
+            !lastName.trim() ||
+            !address.trim() ||
+            !apartment.trim() ||
+            !city.trim() ||
+            !postalCode.trim() ||
+            !phone.trim()
+        ) {
+            alert("Please fill out all fields, including the country dropdown.");
             return;
         }
 
         try {
             const auth = getAuth();
-            const userEmail = auth.currentUser?.email;
-
-            if (!userEmail) {
-                alert("User is not authenticated.");
-                return;
-            }
-
+            const userEmail = auth.currentUser.email;
             const userRef = doc(db, "users", userEmail);
-            await setDoc(userRef, {
-                address: newAddress
-            }, { merge: true });
 
-            setAddress(newAddress);
+            // Save the address as a formatted string
+            const formattedAddress = `${firstName} ${lastName}, ${address}, ${apartment}, ${city}, ${country}, ${postalCode}, Phone: ${phone}`;
+            await setDoc(userRef, { address: formattedAddress }, { merge: true });
+
+            setAddress(formattedAddress);
             setIsAddressFormVisible(false);
             alert("Address saved successfully!");
         } catch (error) {
@@ -121,6 +141,20 @@ const CheckoutPage = () => {
             alert("Failed to save address.");
         }
     };
+
+
+    const generateOrderDetailsHTML = (items) => {
+        return items.map((item) => {
+            const name = item.title || "Unnamed item";
+            const price = parseFloat(item.price).toFixed(2) || "0.00";
+            const quantity = item.quantity || 1;
+            const total = (price * quantity).toFixed(2);
+
+            return `Item: ${name}\nPrice: $${price}\nQuantity: ${quantity}\nTotal: $${total}\n---`;
+        }).join("\n");
+    };
+
+
 
     const handleCheckout = async () => {
         if (!address) {
@@ -133,12 +167,15 @@ const CheckoutPage = () => {
             return;
         }
 
+        setIsLoading(true); // Set loading to true at the start of checkout process
+
         try {
             const auth = getAuth();
             const user = auth.currentUser;
 
             if (!user) {
                 alert("User is not authenticated.");
+                setIsLoading(false); // Stop loading on failure
                 return;
             }
 
@@ -162,7 +199,6 @@ const CheckoutPage = () => {
                     quantity: item.quantity || 1,
                 })),
                 subtotal: parseFloat(subtotal) || 0,
-                shippingFee: parseFloat(shippingFee) || 0,
                 total: parseFloat(total) || 0,
                 paymentMethod: paymentMethod || "cash",
                 status: "Pending",
@@ -171,45 +207,74 @@ const CheckoutPage = () => {
 
             console.log("Order data being saved:", orderData); // Debugging log
 
-            // Save order to Firestore
-            const ordersRef = doc(db, "orders", `${userEmail}_${Date.now()}`);
-            await setDoc(ordersRef, orderData);
+            // Save order to Firestore and get the new order reference
+            const newOrderRef = await saveOrderToFirestore(userEmail, orderData);
 
             // Prepare dynamic variables for the email template
             const emailVariables = {
-                order_details: selectedItems.map((item) => (
-                    `<tr>
-                        <td>${item.title || "Unnamed item"}</td>
-                        <td>${parseFloat(item.price).toFixed(2) || "0.00"}</td>
-                        <td>${item.quantity || 1}</td>
-                    </tr>`
-                )).join(''), // Join all rows into a single string
+                order_details: generateOrderDetailsHTML(selectedItems),
                 shipping_address: address,
                 subtotal: subtotal.toFixed(2),
-                shipping_fee: shippingFee.toFixed(2),
                 total: total.toFixed(2),
                 payment_method: paymentMethod,
             };
-            
+
             console.log("Email variables being passed to EmailJS:", emailVariables); // Log to check if order_details has valid HTML
-            console.log("Order details HTML: ", emailVariables.order_details);
 
             // Send confirmation email
-            await emailjs.send(
-                "service_wng6lvv", // Replace with your service ID
-                "template_zmbrbjb", // Replace with your template ID
-                emailVariables,
-                "kkvWuOpN6HHfFs475" // Replace with your EmailJS user ID
-            );
-            
+            //         // await emailjs.send(
+            //         //     "service_wng6lvv", // Replace with your service ID
+            //         //     "template_zmbrbjb", // Replace with your template ID
+            //         //     emailVariables,
+            //         //     "kkvWuOpN6HHfFs475" // Replace with your EmailJS user ID
+            //         // );
 
             alert("Order placed successfully!");
-            navigate("/order-confirmation", { state: { orderData } });
+
+            // Navigate to the order confirmation page and pass the order ID and data
+            navigate("/order-confirmation", { state: { orderId: newOrderRef.id, orderData } });
         } catch (error) {
             console.error("Error processing checkout:", error);
             alert("Failed to place the order. Please try again.");
+        } finally {
+            setIsLoading(false); // Stop loading after the checkout process completes
         }
     };
+
+
+
+
+    const saveOrderToFirestore = async (userEmail, orderData) => {
+        try {
+            // Ensure that userEmail is valid before continuing
+            if (!userEmail) {
+                throw new Error("User email is required to save the order.");
+            }
+
+            // Reference to the user's document in the "users" collection (document named by userEmail)
+            const userRef = doc(db, "users", userEmail);
+
+            // Reference to the "orders" subcollection within the user's document
+            const ordersRef = collection(userRef, "orders");
+
+            // Create a new document in the "orders" subcollection with a unique ID (using Date.now() as part of the ID)
+            const newOrderRef = doc(ordersRef, `${userEmail}_${Date.now()}`);
+
+            // Save the order data in this new order document
+            await setDoc(newOrderRef, orderData);
+
+            console.log("Order saved successfully!");
+
+            // Return the new order reference
+            return newOrderRef;
+
+        } catch (error) {
+            console.error("Error saving order: ", error);
+            throw error; // Rethrow the error to be caught in the handleCheckout function
+        }
+    };
+
+
 
 
 
@@ -219,6 +284,13 @@ const CheckoutPage = () => {
         <div className="p-6 bg-gray-50 min-h-screen">
             <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-4">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Checkout</h2>
+
+                {/* Loading Indicator */}
+                {isLoading && (
+                    <div className="flex justify-center items-center my-4">
+                        <div className="loader">Loading...</div> {/* You can use a spinner here */}
+                    </div>
+                )}
 
                 {/* Shipping Address */}
                 <div className="mb-6">
@@ -247,33 +319,115 @@ const CheckoutPage = () => {
                     </div>
                 </div>
 
-                {/* Address Form */}
+                {/* Address Form - Show if isAddressFormVisible is true */}
                 {isAddressFormVisible && (
                     <div className="mb-6">
                         <h3 className="text-lg font-semibold text-gray-700 mb-2">Enter New Address</h3>
                         <div className="space-y-4">
-                            <input
-                                type="text"
-                                name="address"
-                                value={newAddress.address}
-                                onChange={handleAddressInputChange}
-                                className="form-field"
-                                placeholder="Enter your address"
-                            />
-                            <button onClick={handleSaveAddress} className="save-btn">
+                            <div>
+                                <label className="block text-sm text-gray-700">Country/Region*</label>
+                                <select
+                                    name="country"
+                                    value={newAddress.country}
+                                    onChange={handleAddressInputChange}
+                                    className="w-full p-2 border rounded-lg"
+                                >
+                                    <option value="">Select Country</option>
+                                    {/* Add country options */}
+                                    <option value="PAKISTAN">Pakistan</option>
+                                </select>
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <label className="block text-sm text-gray-700">First Name*</label>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        value={newAddress.firstName}
+                                        onChange={handleAddressInputChange}
+                                        className="w-full p-2 border rounded-lg"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-sm text-gray-700">Last Name*</label>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        value={newAddress.lastName}
+                                        onChange={handleAddressInputChange}
+                                        className="w-full p-2 border rounded-lg"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-700">Address*</label>
+                                <input
+                                    type="text"
+                                    name="address"
+                                    value={newAddress.address}
+                                    onChange={handleAddressInputChange}
+                                    className="w-full p-2 border rounded-lg"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-700">Apartment*</label>
+                                <input
+                                    type="text"
+                                    name="apartment"
+                                    value={newAddress.apartment}
+                                    onChange={handleAddressInputChange}
+                                    className="w-full p-2 border rounded-lg"
+                                />
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <label className="block text-sm text-gray-700">City*</label>
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        value={newAddress.city}
+                                        onChange={handleAddressInputChange}
+                                        className="w-full p-2 border rounded-lg"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-sm text-gray-700">Postal Code*</label>
+                                    <input
+                                        type="text"
+                                        name="postalCode"
+                                        value={newAddress.postalCode}
+                                        onChange={handleAddressInputChange}
+                                        className="w-full p-2 border rounded-lg"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-700">Phone Number*</label>
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value={newAddress.phone}
+                                    onChange={handleAddressInputChange}
+                                    className="w-full p-2 border rounded-lg"
+                                />
+                            </div>
+                            <button
+                                onClick={handleSaveAddress}
+                                className="w-full bg-blue-600 text-white p-2 rounded-lg"
+                            >
                                 Save Address
                             </button>
                         </div>
-
                     </div>
                 )}
+
 
                 {/* Order Summary */}
                 <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">Order Summary</h3>
                     <div className="bg-gray-100 p-4 rounded-lg">
                         <p className="text-sm text-gray-700">Subtotal: ${subtotal.toFixed(2)}</p>
-                        <p className="text-sm text-gray-700">Shipping Fee: ${shippingFee.toFixed(2)}</p>
+                        {/* <p className="text-sm text-gray-700">Shipping Fee: ${shippingFee.toFixed(2)}</p> */}
                         <p className="text-lg font-semibold text-gray-800">Total: ${total.toFixed(2)}</p>
                     </div>
                 </div>

@@ -76,13 +76,39 @@ const AddAddressPage = () => {
   };
 
   const handleSaveAddress = async () => {
+    // Validation: Check if all fields are filled
+    const {
+      country,
+      firstName,
+      lastName,
+      address,
+      apartment,
+      city,
+      postalCode,
+      phone,
+    } = newAddress;
+
+    if (
+      !country ||
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !address.trim() ||
+      !apartment.trim() ||
+      !city.trim() ||
+      !postalCode.trim() ||
+      !phone.trim()
+    ) {
+      alert("Please fill out all fields, including the country dropdown.");
+      return;
+    }
+
     try {
       const auth = getAuth();
       const userEmail = auth.currentUser.email;
       const userRef = doc(db, "users", userEmail);
 
       // Save the address as a formatted string
-      const formattedAddress = `${newAddress.firstName} ${newAddress.lastName}, ${newAddress.address}, ${newAddress.apartment}, ${newAddress.city}, ${newAddress.country}, ${newAddress.postalCode}, Phone: ${newAddress.phone}`;
+      const formattedAddress = `${firstName} ${lastName}, ${address}, ${apartment}, ${city}, ${country}, ${postalCode}, Phone: ${phone}`;
       await setDoc(userRef, { address: formattedAddress }, { merge: true });
 
       setAddress(formattedAddress);
@@ -93,6 +119,7 @@ const AddAddressPage = () => {
       alert("Failed to save address.");
     }
   };
+
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -132,7 +159,7 @@ const AddAddressPage = () => {
             <h3 className="text-lg font-semibold text-gray-700 mb-2">Enter New Address</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-700">Country/Region</label>
+                <label className="block text-sm text-gray-700">Country/Region*</label>
                 <select
                   name="country"
                   value={newAddress.country}
@@ -141,13 +168,12 @@ const AddAddressPage = () => {
                 >
                   <option value="">Select Country</option>
                   {/* Add country options */}
-                  <option value="USA">USA</option>
-                  <option value="Canada">Canada</option>
+                  <option value="PAKISTAN">Pakistan</option>
                 </select>
               </div>
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="block text-sm text-gray-700">First Name</label>
+                  <label className="block text-sm text-gray-700">First Name*</label>
                   <input
                     type="text"
                     name="firstName"
@@ -157,7 +183,7 @@ const AddAddressPage = () => {
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm text-gray-700">Last Name</label>
+                  <label className="block text-sm text-gray-700">Last Name*</label>
                   <input
                     type="text"
                     name="lastName"
@@ -168,7 +194,7 @@ const AddAddressPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-gray-700">Address</label>
+                <label className="block text-sm text-gray-700">Address*</label>
                 <input
                   type="text"
                   name="address"
@@ -178,7 +204,7 @@ const AddAddressPage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-700">Apartment</label>
+                <label className="block text-sm text-gray-700">Apartment*</label>
                 <input
                   type="text"
                   name="apartment"
@@ -189,7 +215,7 @@ const AddAddressPage = () => {
               </div>
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="block text-sm text-gray-700">City</label>
+                  <label className="block text-sm text-gray-700">City*</label>
                   <input
                     type="text"
                     name="city"
@@ -199,7 +225,7 @@ const AddAddressPage = () => {
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm text-gray-700">Postal Code</label>
+                  <label className="block text-sm text-gray-700">Postal Code*</label>
                   <input
                     type="text"
                     name="postalCode"
@@ -210,7 +236,7 @@ const AddAddressPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-gray-700">Phone Number</label>
+                <label className="block text-sm text-gray-700">Phone Number*</label>
                 <input
                   type="text"
                   name="phone"

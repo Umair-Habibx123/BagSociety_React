@@ -11,6 +11,7 @@
     "autoprefixer": "^10.4.20",
     "emailjs-com": "^3.2.0",
     "firebase": "^11.0.2",
+    "html2canvas": "^1.4.1",
     "material-icons": "^1.13.12",
     "postcss": "^8.4.49",
     "react": "^18.3.1",

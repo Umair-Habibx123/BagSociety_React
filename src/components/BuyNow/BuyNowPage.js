@@ -4,6 +4,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useUser } from '../../context/UserContext';
+import emailjs from 'emailjs-com'; // Import emailjs
+
 
 const BuyNowPage = () => {
   const location = useLocation();
@@ -27,11 +29,18 @@ const BuyNowPage = () => {
 
   const user = useUser();
 
+  // useEffect(() => {
+  //   if (!product) {
+  //     navigate("/cart");
+  //   } else {
+  //     setTotalAmount(product.discountedPrice * quantity);
+  //   }
+  // }, [product, quantity, navigate]);
   useEffect(() => {
     if (!product) {
       navigate("/cart");
     } else {
-      setTotalAmount(product.discountedPrice * quantity);
+      setTotalAmount(product?.discountedPrice ? product.discountedPrice * quantity : 0);
     }
   }, [product, quantity, navigate]);
 
@@ -65,6 +74,20 @@ const BuyNowPage = () => {
     return () => unsubscribe();
   }, [navigate]);
 
+  const handleChangeAddress = () => {
+    setIsAddressFormVisible(true);
+    setNewAddress({
+      country: address?.country || '',
+      firstName: address?.firstName || '',
+      lastName: address?.lastName || '',
+      address: address?.address || '',
+      apartment: address?.apartment || '',
+      city: address?.city || '',
+      postalCode: address?.postalCode || '',
+      phone: address?.phone || ''
+    });
+  };
+
   const handleAddressInputChange = (e) => {
     const { name, value } = e.target;
     setNewAddress((prevState) => ({
@@ -74,15 +97,40 @@ const BuyNowPage = () => {
   };
 
   const handleSaveAddress = async () => {
+    // Validation: Check if all fields are filled
+    const {
+      country,
+      firstName,
+      lastName,
+      address,
+      apartment,
+      city,
+      postalCode,
+      phone,
+    } = newAddress;
+
+    if (
+      !country ||
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !address.trim() ||
+      !apartment.trim() ||
+      !city.trim() ||
+      !postalCode.trim() ||
+      !phone.trim()
+    ) {
+      alert("Please fill out all fields, including the country dropdown.");
+      return;
+    }
+
     try {
       const auth = getAuth();
       const userEmail = auth.currentUser.email;
       const userRef = doc(db, "users", userEmail);
 
-      const formattedAddress = `${newAddress.firstName} ${newAddress.lastName}, ${newAddress.address}, ${newAddress.apartment}, ${newAddress.city}, ${newAddress.country}, ${newAddress.postalCode}, Phone: ${newAddress.phone}`;
-      await setDoc(userRef, {
-        address: formattedAddress
-      }, { merge: true });
+      // Save the address as a formatted string
+      const formattedAddress = `${firstName} ${lastName}, ${address}, ${apartment}, ${city}, ${country}, ${postalCode}, Phone: ${phone}`;
+      await setDoc(userRef, { address: formattedAddress }, { merge: true });
 
       setAddress(formattedAddress);
       setIsAddressFormVisible(false);
@@ -93,32 +141,79 @@ const BuyNowPage = () => {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!address) {
       alert("Please provide your address before proceeding.");
       return;
     }
 
-    alert("Order placed successfully! Cash on Delivery selected.");
+    // Create the order data
+    const orderData = {
+      product: {
+        title: product?.title || "Unnamed product", // Match with `CartPage`
+        price: parseFloat(product?.discountedPrice) || 0,
+        quantity: quantity || 1,
+        total: (parseFloat(product?.discountedPrice) * quantity).toFixed(2),
+      },
+      totalAmount: totalAmount.toFixed(2),
+      shippingAddress: address,
+      paymentMethod: "Cash on Delivery", // or dynamic if needed
+    };
+
+    console.log("Order data being saved:", orderData); // Debugging log
+
+    try {
+      // Navigate to the CheckoutPage with order data
+      navigate("/checkout", {
+        state: {
+          selectedItems: [orderData.product], // Pass the product details
+          totalAmount: parseFloat(orderData.totalAmount), // Total amount
+          shippingAddress: orderData.shippingAddress, // Address
+        },
+      });
+    } catch (error) {
+      console.error("Error navigating to checkout page:", error);
+      alert("Failed to proceed to checkout. Please try again.");
+    }
   };
 
+
+  // const increaseQuantity = () => {
+  //   setQuantity((prevQuantity) => {
+  //     const updatedQuantity = prevQuantity + 1;
+  //     setTotalAmount(product.discountedPrice * updatedQuantity);
+  //     return updatedQuantity;
+  //   });
+  // };
+
+  // const decreaseQuantity = () => {
+  //   setQuantity((prevQuantity) => {
+  //     if (prevQuantity > 1) {
+  //       const updatedQuantity = prevQuantity - 1;
+  //       setTotalAmount(product.discountedPrice * updatedQuantity);
+  //       return updatedQuantity;
+  //     }
+  //     return prevQuantity;
+  //   });
+  // };
   const increaseQuantity = () => {
-    setQuantity((prevQuantity) => {
-      const updatedQuantity = prevQuantity + 1;
-      setTotalAmount(product.discountedPrice * updatedQuantity);
-      return updatedQuantity;
-    });
+    if (product && product.discountedPrice) {
+      setQuantity((prevQuantity) => {
+        const updatedQuantity = prevQuantity + 1;
+        setTotalAmount(product.discountedPrice * updatedQuantity);
+        return updatedQuantity;
+      });
+    }
   };
-
+  
   const decreaseQuantity = () => {
-    setQuantity((prevQuantity) => {
-      if (prevQuantity > 1) {
+    if (product && product.discountedPrice && quantity > 1) {
+      setQuantity((prevQuantity) => {
         const updatedQuantity = prevQuantity - 1;
         setTotalAmount(product.discountedPrice * updatedQuantity);
         return updatedQuantity;
-      }
-      return prevQuantity;
-    });
+      });
+    }
   };
 
   return (
@@ -146,7 +241,7 @@ const BuyNowPage = () => {
           </div>
         </div>
 
-        {/* Address Section */}
+        {/* Shipping Address */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Shipping Address</h3>
           <div className="p-4 border rounded-lg bg-gray-100">
@@ -155,17 +250,125 @@ const BuyNowPage = () => {
             ) : address ? (
               <div>
                 <p className="text-sm text-gray-800">{address}</p>
-                <p onClick={() => setIsAddressFormVisible(true)} className="text-blue-600 text-sm cursor-pointer mt-2">
+                <p
+                  onClick={handleChangeAddress}
+                  className="text-blue-600 text-sm cursor-pointer mt-2"
+                >
                   Change Address
                 </p>
               </div>
             ) : (
-              <p onClick={() => setIsAddressFormVisible(true)} className="text-blue-600 text-center cursor-pointer">
+              <p
+                onClick={() => setIsAddressFormVisible(true)}
+                className="text-blue-600 text-center cursor-pointer"
+              >
                 Add New Address
               </p>
             )}
           </div>
         </div>
+
+        {/* Address Form - Show if isAddressFormVisible is true */}
+        {isAddressFormVisible && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">Enter New Address</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-700">Country/Region*</label>
+                <select
+                  name="country"
+                  value={newAddress.country}
+                  onChange={handleAddressInputChange}
+                  className="w-full p-2 border rounded-lg"
+                >
+                  <option value="">Select Country</option>
+                  {/* Add country options */}
+                  <option value="PAKISTAN">Pakistan</option>
+                </select>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm text-gray-700">First Name*</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={newAddress.firstName}
+                    onChange={handleAddressInputChange}
+                    className="w-full p-2 border rounded-lg"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm text-gray-700">Last Name*</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={newAddress.lastName}
+                    onChange={handleAddressInputChange}
+                    className="w-full p-2 border rounded-lg"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700">Address*</label>
+                <input
+                  type="text"
+                  name="address"
+                  value={newAddress.address}
+                  onChange={handleAddressInputChange}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700">Apartment*</label>
+                <input
+                  type="text"
+                  name="apartment"
+                  value={newAddress.apartment}
+                  onChange={handleAddressInputChange}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm text-gray-700">City*</label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={newAddress.city}
+                    onChange={handleAddressInputChange}
+                    className="w-full p-2 border rounded-lg"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm text-gray-700">Postal Code*</label>
+                  <input
+                    type="text"
+                    name="postalCode"
+                    value={newAddress.postalCode}
+                    onChange={handleAddressInputChange}
+                    className="w-full p-2 border rounded-lg"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700">Phone Number*</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={newAddress.phone}
+                  onChange={handleAddressInputChange}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <button
+                onClick={handleSaveAddress}
+                className="w-full bg-blue-600 text-white p-2 rounded-lg"
+              >
+                Save Address
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Payment Method */}
         <div className="mb-6">
