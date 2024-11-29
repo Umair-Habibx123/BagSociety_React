@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import Hero from './components/Hero/Hero';
 import { UserProvider } from './context/UserContext';
@@ -19,12 +19,27 @@ import ProductDetail from "./components/ProductCard/productDetails";
 import MyOrdersPage from './components/MyOrders/myorders';
 import OrderConfirmationPage from './components/OrderConfirmation/OrderConfirmationPage';
 
+
+// Component to scroll to the top
+function ScrollToTop() {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);  // Scroll to the top of the page whenever route changes
+  }, [location]);  // Depend on `location` to trigger the effect on route change
+
+  return null; // This component doesn't render anything
+}
+
 function App() {
+
   return (
     <UserProvider>
       <Router>
         <div>
           <Navbar />
+          {/* ScrollToTop component ensures page scrolls to the top on route change */}
+          <ScrollToTop />
 
           {/* Routes for different pages */}
           <Routes>
@@ -49,7 +64,6 @@ function App() {
                 <ProductDetail /> {/* Displays detailed view of the selected product */}
               </>
             } />
-
 
             <Route path="/my-cart" element={
               <>
@@ -100,8 +114,6 @@ function App() {
             } />
 
             <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
-
-
           </Routes>
 
           <Footer />

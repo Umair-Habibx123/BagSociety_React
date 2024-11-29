@@ -47,6 +47,11 @@ function Navbar() {
     }
   };
 
+    // Function to close the hamburger menu when a link is clicked
+    const closeMenu = () => {
+      setIsOpen(false); // Close the hamburger menu
+    };
+
 
   // Listen for authentication state changes (check if the user is logged in or not)
   useEffect(() => {
@@ -125,12 +130,12 @@ function Navbar() {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle the dropdown menu
             />
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg text-black z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg text-black z-50"  onClick={closeMenu}>
                 {/* Mobile dropdown options */}
                 <Link
                   to="/setting"
                 >
-                  <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
+                  <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"  onClick={closeMenu}>
                     View Profile
                   </button>
                 </Link>
@@ -139,8 +144,7 @@ function Navbar() {
                   to="/MyOrders"
                 >
                   <button
-                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
-                  >
+                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"  onClick={closeMenu}>
                     My Orders
                   </button>
                 </Link>
@@ -151,7 +155,7 @@ function Navbar() {
                     setUser(null); // Set user state to null when logging out
                     setIsDropdownOpen(false); // Close the dropdown
                   }}
-                  className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
+                  className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100" >
                   Logout
                 </button>
               </div>
@@ -167,12 +171,12 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/"
-              className="block py-2 px-4 text-white hover:text-blue-400"
+              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu} 
             >
               Home
             </Link>
           </li>
-          <li className="border-b border-gray-700 md:border-none">
+          <li onClick={closeMenu} className="border-b border-gray-700 md:border-none" >
             <Link
               to="/all-products"
               className="block py-2 px-4 text-white hover:text-blue-400"
@@ -183,7 +187,7 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/my-cart"
-              className="block py-2 px-4 text-white hover:text-blue-400"
+              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu} 
             >
               Cart
             </Link>
@@ -191,7 +195,7 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/contact-us"
-              className="block py-2 px-4 text-white hover:text-blue-400"
+              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu} 
             >
               Contact
             </Link>

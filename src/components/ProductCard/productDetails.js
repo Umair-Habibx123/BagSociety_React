@@ -1,6 +1,8 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth } from "../../firebase"; // Make sure the path is correct
 import { db } from "../../firebase"; // Ensure this path is correct
 import { useUser } from "../../context/UserContext"; // Corrected import
 
@@ -14,6 +16,8 @@ const ProductDetail = () => {
     const [loadingAddToCart, setLoadingAddToCart] = useState(false); // Loading state for adding to cart
     const user = useUser(); // Access user context using the useUser hook
     const navigate = useNavigate(); // To navigate to other pages
+    const [profilePic, setProfilePic] = useState("/default-profile.png");
+    const provider = new GoogleAuthProvider();
 
     useEffect(() => {
         if (!productId) {
@@ -50,6 +54,35 @@ const ProductDetail = () => {
 
         fetchProduct();
     }, [productId]);
+
+    const handleSignIn = async () => {
+        try {
+            const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
+            const user = result.user; // Get the logged-in user
+
+            // Reference to the user's document in Firestore using their email
+            const userDocRef = doc(db, "users", user.email);
+
+            // Check if the user's document already exists
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                // If the user document exists, load existing data
+                const userData = userDocSnap.data();
+                setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
+            } else {
+                // If the user document doesn't exist, create a new one
+                await setDoc(userDocRef, {
+                    username: user.displayName,
+                    email: user.email,
+                    profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
+                });
+                setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
+            }
+        } catch (error) {
+            console.error("Error logging in with Google:", error);
+        }
+    };
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
@@ -173,24 +206,48 @@ const ProductDetail = () => {
                     <div><span className="font-semibold">Material:</span> {material}</div>
                     <div><span className="font-semibold">Measurements:</span> {measurements}</div>
                     <div><span className="font-semibold">Pouch Inside:</span> {pouchInside}</div>
-                    <div><span className="font-semibold">Clutch Inside:</span> {clutchInside}</div>
                     <div><span className="font-semibold">Compartments:</span> {compartments}</div>
+                    <div><span className="font-semibold">Clutch Inside:</span> {clutchInside}</div>
                     <div><span className="font-semibold">Straps:</span> {straps}</div>
                 </div>
             </div>
-
-            {/* Show login prompt if needed */}
+            {/* Login Prompt Modal */}
             {showLoginPrompt && (
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-                        <h2 className="text-xl font-bold text-center">Please Log In</h2>
-                        <p className="text-center mb-4">You need to log in to add items to your cart or purchase.</p>
-                        <button onClick={() => navigate("/login")} className="w-full py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors">
-                            Log In
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-8 rounded-lg shadow-lg text-center relative">
+                        {/* Close Button */}
+                        <button
+                            onClick={() => setShowLoginPrompt(false)} // Close the modal
+                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                                stroke="currentColor"
+                                className="w-6 h-6"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+
+                        {/* Modal Content */}
+                        <p>Please log in to add items to your cart.</p>
+                        <button
+                            onClick={handleSignIn}
+                            className="mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg"
+                        >
+                            Log in with Google
                         </button>
                     </div>
                 </div>
             )}
+
         </div>
     );
 };

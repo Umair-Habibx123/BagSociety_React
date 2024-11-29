@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom"; // Importing useNavigate f
 const ProductCard = ({ product }) => {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false); // State for the login prompt modal
   const [added, setAdded] = useState(false);
+  const [user, setUser] = useState(null); // User state to manage logged-in user info
   const userContext = useUser(); // Get the logged-in user from context
   const [profilePic, setProfilePic] = useState("/default-profile.png"); // Default profile picture
   const [userState, setUserState] = useState(null); // User state to manage logged-in user info
@@ -44,31 +45,32 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  // Handle Google sign-in
   const handleSignIn = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+      const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
+      const user = result.user; // Get the logged-in user
 
-      // Check if the user already exists in Firestore (based on their email)
-      const userDocRef = doc(db, "users", user.email); // Firestore document for the user using their email
+      // Reference to the user's document in Firestore using their email
+      const userDocRef = doc(db, "users", user.email);
+
+      // Check if the user's document already exists
       const userDocSnap = await getDoc(userDocRef);
 
-      if (!userDocSnap.exists()) {
-        // If user document doesn't exist, create a new document for the user
+      if (userDocSnap.exists()) {
+        // If the user document exists, load existing data
+        const userData = userDocSnap.data();
+        setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
+      } else {
+        // If the user document doesn't exist, create a new one
         await setDoc(userDocRef, {
           username: user.displayName,
           email: user.email,
-          profilePic: user.photoURL || "/default-profile.png", // Default image if none exists
+          profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
         });
-        setProfilePic(user.photoURL || "/default-profile.png"); // Update profile picture
-      } else {
-        // If user document exists, load existing data
-        const userData = userDocSnap.data();
-        setProfilePic(userData.profilePic || "/default-profile.png"); // Use stored profile picture
+        setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
       }
 
-      setUserState(user); // Set the user state after successful login
+      setUser(user); // Update the user state with the logged-in user's info
     } catch (error) {
       console.error("Error logging in with Google:", error);
     }
