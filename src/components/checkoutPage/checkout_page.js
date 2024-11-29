@@ -157,8 +157,7 @@ const CheckoutPage = () => {
                     address: address || "Address not provided",
                 },
                 items: selectedItems.map((item) => ({
-                    id: item.id || "N/A",
-                    name: item.name || "Unnamed item",
+                    name: item.title || "Unnamed item",
                     price: parseFloat(item.price) || 0,
                     quantity: item.quantity || 1,
                 })),
@@ -176,40 +175,33 @@ const CheckoutPage = () => {
             const ordersRef = doc(db, "orders", `${userEmail}_${Date.now()}`);
             await setDoc(ordersRef, orderData);
 
-            // Prepare email content
-            const emailContent = `
-                <h1>Order Confirmation</h1>
-                <p><strong>User:</strong> ${username} (${userEmail})</p>
-                <p><strong>Shipping Address:</strong></p>
-                <pre>${JSON.stringify(address, null, 2)}</pre>
-                <p><strong>Order Summary:</strong></p>
-                <ul>
-                    ${selectedItems
-                    .map(
-                        (item) =>
-                            `<li>${item.name} - $${item.price.toFixed(2)} x ${item.quantity}</li>`
-                    )
-                    .join("")}
-                </ul>
-                <p><strong>Subtotal:</strong> $${subtotal.toFixed(2)}</p>
-                <p><strong>Shipping Fee:</strong> $${shippingFee.toFixed(2)}</p>
-                <p><strong>Total:</strong> $${total.toFixed(2)}</p>
-                <p><strong>Payment Method:</strong> ${paymentMethod}</p>
-                <p><strong>Status:</strong> ${orderData.status}</p>
-            `;
+            // Prepare dynamic variables for the email template
+            const emailVariables = {
+                order_details: selectedItems.map((item) => (
+                    `<tr>
+                        <td>${item.title || "Unnamed item"}</td>
+                        <td>${parseFloat(item.price).toFixed(2) || "0.00"}</td>
+                        <td>${item.quantity || 1}</td>
+                    </tr>`
+                )).join(''), // Join all rows into a single string
+                shipping_address: address,
+                subtotal: subtotal.toFixed(2),
+                shipping_fee: shippingFee.toFixed(2),
+                total: total.toFixed(2),
+                payment_method: paymentMethod,
+            };
+            
+            console.log("Email variables being passed to EmailJS:", emailVariables); // Log to check if order_details has valid HTML
+            console.log("Order details HTML: ", emailVariables.order_details);
 
             // Send confirmation email
             await emailjs.send(
                 "service_wng6lvv", // Replace with your service ID
                 "template_zmbrbjb", // Replace with your template ID
-                {
-                    to_email: "umairhabibabc@gmail.com", // Recipient's email
-                    user_email: userEmail, // User's email
-                    username: username, // User's name
-                    order_details: emailContent, // Order details in HTML format
-                },
+                emailVariables,
                 "kkvWuOpN6HHfFs475" // Replace with your EmailJS user ID
             );
+            
 
             alert("Order placed successfully!");
             navigate("/order-confirmation", { state: { orderData } });
@@ -218,6 +210,7 @@ const CheckoutPage = () => {
             alert("Failed to place the order. Please try again.");
         }
     };
+
 
 
 

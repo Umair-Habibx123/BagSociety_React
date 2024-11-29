@@ -13,6 +13,7 @@ const CartPage = () => {
     const [totalPrice, setTotalPrice] = useState(0);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
+    const [loadingItem, setLoadingItem] = useState(null); // To track loading state for individual items
 
     useEffect(() => {
         if (currentUser) {
@@ -42,10 +43,28 @@ const CartPage = () => {
         }
     };
 
+    const handleRemoveItem = async (itemId) => {
+        if (!currentUser) return;
+
+        setLoadingItem(itemId); // Set loading for the specific item
+        const updatedCart = cart.filter((item) => item.id !== itemId);
+
+        try {
+            const cartRef = doc(db, "userCart", currentUser.uid);
+            await setDoc(cartRef, { items: updatedCart });
+            setCart(updatedCart);
+            calculateTotalPrice(updatedCart, selectedItems);
+        } catch (error) {
+            console.error("Error removing item from cart:", error);
+        } finally {
+            setLoadingItem(null); // Clear loading state
+        }
+    };
 
     const handleQuantityChange = async (itemId, change) => {
         if (!currentUser) return;
 
+        setLoadingItem(itemId); // Set loading for the specific item
         const updatedCart = cart.map((item) =>
             item.id === itemId
                 ? { ...item, quantity: Math.max(1, (item.quantity || 1) + change) }
@@ -59,9 +78,10 @@ const CartPage = () => {
             calculateTotalPrice(updatedCart, selectedItems);
         } catch (error) {
             console.error("Error updating item quantity:", error);
+        } finally {
+            setLoadingItem(null); // Clear loading state
         }
     };
-
 
     const handleItemSelect = (itemId) => {
         setSelectedItems((prevSelectedItems) =>
@@ -150,19 +170,31 @@ const CartPage = () => {
                                             onChange={() => handleItemSelect(item.id)}
                                             className="h-5 w-5"
                                         />
-                                        <button
-                                            onClick={() => handleQuantityChange(item.id, -1)}
-                                            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs md:text-sm"
-                                        >
-                                            -
-                                        </button>
-                                        <span className="text-xs md:text-sm">{item.quantity || 1}</span>
-                                        <button
-                                            onClick={() => handleQuantityChange(item.id, 1)}
-                                            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs md:text-sm"
-                                        >
-                                            +
-                                        </button>
+                                        {loadingItem === item.id ? (
+                                            <div className="animate-spin border-2 border-blue-400 rounded-full w-5 h-5 border-t-transparent"></div>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    onClick={() => handleQuantityChange(item.id, -1)}
+                                                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs md:text-sm"
+                                                >
+                                                    -
+                                                </button>
+                                                <span className="text-xs md:text-sm">{item.quantity || 1}</span>
+                                                <button
+                                                    onClick={() => handleQuantityChange(item.id, 1)}
+                                                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs md:text-sm"
+                                                >
+                                                    +
+                                                </button>
+                                                <button
+                                                    onClick={() => handleRemoveItem(item.id)}
+                                                    className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs md:text-sm"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </li>
                             ))}
@@ -188,7 +220,6 @@ const CartPage = () => {
                             Checkout
                         </button>
                     </Link>
-
                 </div>
             </div>
         </div>

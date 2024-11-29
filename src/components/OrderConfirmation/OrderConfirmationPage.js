@@ -12,13 +12,21 @@ const OrderConfirmationPage = () => {
                 <p>Thank you for your order!</p>
                 <p className="text-gray-600">Order ID: {orderData?.id}</p>
                 <h3 className="mt-4 text-lg font-bold">Order Summary:</h3>
-                <ul>
+                {/* <ul>
                     {orderData?.items.map((item) => (
                         <li key={item.id}>
                             {item.title} - {item.quantity} x Rs. {item.price}
                         </li>
                     ))}
+                </ul> */}
+                <ul>
+                    {orderData.items.map((item, index) => (
+                        <li key={index}>
+                            {item.quantity} x {item.name} - ${item.price.toFixed(2)}
+                        </li>
+                    ))}
                 </ul>
+
                 <p className="mt-4">Total: Rs. {orderData?.total}</p>
             </div>
         </div>

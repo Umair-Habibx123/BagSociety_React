@@ -12,19 +12,10 @@ import CartPage from './components/CartPage/cartpage';
 import ContactUsForm from './components/ContactPage/contactus';
 import CheckoutPage from './components/checkoutPage/checkout_page';
 import SettingsPage from './components/Settings/setting';
-import PaymentPage from './components/Settings/payment';
-import OrderList from './components/Settings/myorders';
 import UserDetails from './components/Settings/UserDetails';
 import AddAddressPage from './components/Settings/AddAddressPage';
 import BuyNowPage from './components/BuyNow/BuyNowPage';
 import OrderConfirmationPage from './components/OrderConfirmation/OrderConfirmationPage';
-
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-
-
-const stripePromise = loadStripe("pk_test_51QOCsjG75TGzEhkJZOpAO9uh6tnI7wWD64rJoxEqx9y6DZGmiTOPBWvmVuMs5ABGUVdU5GvOsDvGT51aAG196r1S008d0El8NR");
-
 
 function App() {
   return (
@@ -64,29 +55,13 @@ function App() {
 
             <Route path="/checkout" element={
               <>
-                <Elements stripe={stripePromise}>
                   <CheckoutPage /> {/* cart page */}
-                </Elements>
               </>
             } />
 
             <Route path="/setting" element={
               <>
                 <SettingsPage /> {/* cart page */}
-              </>
-            } />
-
-            <Route path="/MyPayments" element={
-              <>
-                <Elements stripe={stripePromise}>
-                  <PaymentPage /> {/* cart page */}
-                </Elements>
-              </>
-            } />
-
-            <Route path="/MyOrders" element={
-              <>
-                <OrderList /> {/* cart page */}
               </>
             } />
 
@@ -104,9 +79,7 @@ function App() {
 
             <Route path="/BuyNow" element={
               <>
-                <Elements stripe={stripePromise}>
                   <BuyNowPage /> {/* cart page */}
-                </Elements>
               </>
             } />
 
