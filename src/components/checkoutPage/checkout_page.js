@@ -222,12 +222,12 @@ const CheckoutPage = () => {
             console.log("Email variables being passed to EmailJS:", emailVariables); // Log to check if order_details has valid HTML
 
             // Send confirmation email
-                      await emailjs.send(
-                          "service_wng6lvv", // Replace with your service ID
-                          "template_zmbrbjb", // Replace with your template ID
-                          emailVariables,
-                          "kkvWuOpN6HHfFs475" // Replace with your EmailJS user ID
-                      );
+                 //     await emailjs.send(
+                 //         "service_wng6lvv", // Replace with your service ID
+                 //         "template_zmbrbjb", // Replace with your template ID
+                  //        emailVariables,
+                   //       "kkvWuOpN6HHfFs475" // Replace with your EmailJS user ID
+                  //    );
 
             alert("Order placed successfully!");
 
