@@ -21,7 +21,7 @@ server/node_modules
 .env.production.local
 
 # Firebase Admin SDK credentials (important: keep these private)
-bagsociety-firebase-adminsdk-gy00r-497e191bf3.json
+bagsociety-firebase-adminsdk-gy00r-497e191bf3000.json
 
 # Debug log files
 npm-debug.log*
