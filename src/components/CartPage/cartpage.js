@@ -37,14 +37,6 @@ const CartPage = () => {
         calculateTotalPrice(cart, selectedItems);
     }, [selectedItems, cart]);
 
-    // const handleSignIn = async () => {
-    //     try {
-    //         const result = await signInWithPopup(auth, provider);
-    //     } catch (error) {
-    //         console.error("Error logging in with Google:", error);
-    //     }
-    // };
-
 
     const handleSignIn = async () => {
         try {

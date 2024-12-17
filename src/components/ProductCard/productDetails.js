@@ -14,10 +14,10 @@ const ProductDetail = () => {
     const [added, setAdded] = useState(false); // State to track if item is added to cart
     const [showLoginPrompt, setShowLoginPrompt] = useState(false); // State to show login prompt
     const [loadingAddToCart, setLoadingAddToCart] = useState(false); // Loading state for adding to cart
-    const user = useUser(); // Access user context using the useUser hook
     const navigate = useNavigate(); // To navigate to other pages
     const [profilePic, setProfilePic] = useState("/default-profile.png");
     const provider = new GoogleAuthProvider();
+    const [user, setUser] = useState(null); // User state to manage logged-in user info
 
     useEffect(() => {
         if (!productId) {
@@ -79,6 +79,8 @@ const ProductDetail = () => {
                 });
                 setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
             }
+
+            setUser(user); // Update the user state with the logged-in user's info
         } catch (error) {
             console.error("Error logging in with Google:", error);
         }

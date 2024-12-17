@@ -29,13 +29,6 @@ const BuyNowPage = () => {
 
   const user = useUser();
 
-  // useEffect(() => {
-  //   if (!product) {
-  //     navigate("/cart");
-  //   } else {
-  //     setTotalAmount(product.discountedPrice * quantity);
-  //   }
-  // }, [product, quantity, navigate]);
   useEffect(() => {
     if (!product) {
       navigate("/cart");
@@ -178,24 +171,6 @@ const BuyNowPage = () => {
   };
 
 
-  // const increaseQuantity = () => {
-  //   setQuantity((prevQuantity) => {
-  //     const updatedQuantity = prevQuantity + 1;
-  //     setTotalAmount(product.discountedPrice * updatedQuantity);
-  //     return updatedQuantity;
-  //   });
-  // };
-
-  // const decreaseQuantity = () => {
-  //   setQuantity((prevQuantity) => {
-  //     if (prevQuantity > 1) {
-  //       const updatedQuantity = prevQuantity - 1;
-  //       setTotalAmount(product.discountedPrice * updatedQuantity);
-  //       return updatedQuantity;
-  //     }
-  //     return prevQuantity;
-  //   });
-  // };
   const increaseQuantity = () => {
     if (product && product.discountedPrice) {
       setQuantity((prevQuantity) => {
@@ -205,7 +180,7 @@ const BuyNowPage = () => {
       });
     }
   };
-  
+
   const decreaseQuantity = () => {
     if (product && product.discountedPrice && quantity > 1) {
       setQuantity((prevQuantity) => {

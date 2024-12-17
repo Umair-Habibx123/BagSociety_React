@@ -120,7 +120,7 @@ function App() {
 
           <div className="whatsapp-icon">
             <a
-              href="https://wa.me/yourPhoneNumber" // Replace with your WhatsApp number link
+              href="https://wa.me/03108026280" // Replace with your WhatsApp number link
               target="_blank"
               rel="noopener noreferrer"
             >
