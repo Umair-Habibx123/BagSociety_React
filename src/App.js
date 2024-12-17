@@ -18,6 +18,13 @@ import BuyNowPage from './components/BuyNow/BuyNowPage';
 import ProductDetail from "./components/ProductCard/productDetails";
 import MyOrdersPage from './components/MyOrders/myorders';
 import OrderConfirmationPage from './components/OrderConfirmation/OrderConfirmationPage';
+import AdminDashboard from './components/AdminDashboard/AdminDashboard';
+import ProtectedRoute from './context/ProtectedRoute';
+import ShowUsers from './components/AdminDashboard/ShowUsers';
+import Forbidden from './components/AdminDashboard/Forbidden';
+import EditUsers from './components/AdminDashboard/EditUsers';
+import ShowProducts from './components/AdminDashboard/ShowProducts';
+import AddNewProduct from './components/AdminDashboard/AddProduct';
 
 
 // Component to scroll to the top
@@ -65,6 +72,7 @@ function App() {
               </>
             } />
 
+
             <Route path="/my-cart" element={
               <>
                 <CartPage /> {/* cart page */}
@@ -95,6 +103,58 @@ function App() {
               </>
             } />
 
+
+            <Route path="/admin-dashboard/*" element={
+              <>
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              </>
+            } />
+
+
+            <Route
+              path="/admin-dashboard/showUsers"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <ShowUsers />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin-dashboard/showProducts"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <ShowProducts />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin-dashboard/editUsers"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <EditUsers />
+                </ProtectedRoute>
+              }
+            />
+
+<Route
+              path="/admin-dashboard/addNewProducts"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AddNewProduct />
+                </ProtectedRoute>
+              }
+            />
+
+
+
+
+            {/* Catch-all for Forbidden access */}
+            <Route path="/forbidden" element={<Forbidden />} />
+
             <Route path="/add-address" element={
               <>
                 <AddAddressPage /> {/* cart page */}
@@ -118,13 +178,25 @@ function App() {
 
           <Footer />
 
-          <div className="whatsapp-icon">
+          {/* <div className="whatsapp-icon">
             <a
               href="https://wa.me/+923108026280" // Replace with your WhatsApp number link
               target="_blank"
               rel="noopener noreferrer"
             >
               <FaWhatsapp className="whatsapp-icon-img" />
+            </a>
+          </div> */}
+
+          <div className="whatsapp-icon">
+            <a
+              href="https://wa.me/+923108026280" // Replace with your WhatsApp number link
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out"
+            >
+              <FaWhatsapp className="text-2xl" /> {/* WhatsApp Icon */}
+              <span>for any help</span> {/* Contact text */}
             </a>
           </div>
         </div>

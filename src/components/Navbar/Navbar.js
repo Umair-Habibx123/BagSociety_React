@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { db } from "../../firebase"; // Your firebase configuration file
 import { doc, setDoc, getDoc } from "firebase/firestore";
@@ -11,9 +11,11 @@ function Navbar() {
   const [user, setUser] = useState(null); // User state to manage logged-in user info
   const [profilePic, setProfilePic] = useState("/default-profile.png"); // Default profile picture
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // To toggle the dropdown visibility
+  const [userRole, setUserRole] = useState("user"); // State to store the user's role
 
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
+  const navigate = useNavigate();
 
 
   const handleSignIn = async () => {
@@ -30,6 +32,7 @@ function Navbar() {
       if (userDocSnap.exists()) {
         // If the user document exists, load existing data
         const userData = userDocSnap.data();
+        setUserRole(userData.role || "user"); // Set user role from Firestore
         setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
       } else {
         // If the user document doesn't exist, create a new one
@@ -37,8 +40,10 @@ function Navbar() {
           username: user.displayName,
           email: user.email,
           profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
+          role: "user",
         });
         setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
+        setUserRole("user");
       }
 
       setUser(user); // Update the user state with the logged-in user's info
@@ -47,10 +52,10 @@ function Navbar() {
     }
   };
 
-    // Function to close the hamburger menu when a link is clicked
-    const closeMenu = () => {
-      setIsOpen(false); // Close the hamburger menu
-    };
+  // Function to close the hamburger menu when a link is clicked
+  const closeMenu = () => {
+    setIsOpen(false); // Close the hamburger menu
+  };
 
 
   // Listen for authentication state changes (check if the user is logged in or not)
@@ -64,11 +69,13 @@ function Navbar() {
           const userDocSnap = await getDoc(userDocRef);
           if (userDocSnap.exists()) {
             setProfilePic(userDocSnap.data().profilePic || "/default-profile.png");
+            setUserRole(userDocSnap.data().role || "user"); // Set user role
           }
         };
         fetchUserProfilePic();
       } else {
         setUser(null); // Reset user when logged out
+        setUserRole("user"); // Reset role
       }
     });
     return unsubscribe;
@@ -130,12 +137,12 @@ function Navbar() {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle the dropdown menu
             />
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg text-black z-50"  onClick={closeMenu}>
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg text-black z-50" onClick={closeMenu}>
                 {/* Mobile dropdown options */}
                 <Link
                   to="/setting"
                 >
-                  <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"  onClick={closeMenu}>
+                  <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100" onClick={closeMenu}>
                     View Profile
                   </button>
                 </Link>
@@ -144,16 +151,25 @@ function Navbar() {
                   to="/MyOrders"
                 >
                   <button
-                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"  onClick={closeMenu}>
+                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100" onClick={closeMenu}>
                     My Orders
                   </button>
                 </Link>
+
+                {userRole === "admin" && ( // Show Admin Dashboard for admins only
+                  <Link to="/admin-dashboard">
+                    <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
+                      Admin Dashboard
+                    </button>
+                  </Link>
+                )}
 
                 <button
                   onClick={() => {
                     auth.signOut();
                     setUser(null); // Set user state to null when logging out
                     setIsDropdownOpen(false); // Close the dropdown
+                    navigate("/");
                   }}
                   className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100" >
                   Logout
@@ -171,7 +187,7 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/"
-              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu} 
+              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu}
             >
               Home
             </Link>
@@ -187,7 +203,7 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/my-cart"
-              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu} 
+              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu}
             >
               Cart
             </Link>
@@ -195,7 +211,7 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/contact-us"
-              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu} 
+              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu}
             >
               Contact
             </Link>
@@ -235,11 +251,20 @@ function Navbar() {
                     </button>
                   </Link>
 
+                  {userRole === "admin" && ( // Show Admin Dashboard for admins only
+                    <Link to="/admin-dashboard">
+                      <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
+                        Admin Dashboard
+                      </button>
+                    </Link>
+                  )}
+
                   <button
                     onClick={() => {
                       auth.signOut(); // Sign out from auth
                       setUser(null); // Set user state to null when logging out
                       setIsDropdownOpen(false); // Close the dropdown
+                      navigate("/");
                       window.location.reload(); // Refresh the page to clear any remaining data
                     }}
                     className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"

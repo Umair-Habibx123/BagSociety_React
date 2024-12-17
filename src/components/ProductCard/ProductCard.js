@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect  } from "react";
 import { db } from "../../firebase";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
@@ -12,10 +12,31 @@ const ProductCard = ({ product }) => {
   const userContext = useUser(); // Get the logged-in user from context
   const [profilePic, setProfilePic] = useState("/default-profile.png"); // Default profile picture
   const [userState, setUserState] = useState(null); // User state to manage logged-in user info
+  const [userRole, setUserRole] = useState("user"); // State to store the user's role
 
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate(); // Initialize the useNavigate hook
+
+  // Fetch user role from Firestore when userContext changes
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (userContext?.email) {
+        try {
+          const userRef = doc(db, "users", userContext.email);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            setUserRole(userSnap.data().role || "user"); // Default role is "user"
+          }
+        } catch (error) {
+          console.error("Error fetching user role:", error);
+        }
+      }
+    };
+
+    fetchUserRole();
+  }, [userContext]);
+
 
   const handleAddToCart = async (e) => {
     e.stopPropagation(); // Prevents the click event from reaching the card
@@ -25,7 +46,7 @@ const ProductCard = ({ product }) => {
     }
 
     try {
-      const cartRef = doc(db, "userCart", userContext.uid);
+      const cartRef = doc(db, "userCart", userContext.email);
       const cartDoc = await getDoc(cartRef);
 
       let updatedCart = [];
@@ -45,37 +66,6 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  // const handleSignIn = async () => {
-  //   try {
-  //     const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
-  //     const user = result.user; // Get the logged-in user
-
-  //     // Reference to the user's document in Firestore using their email
-  //     const userDocRef = doc(db, "users", user.email);
-
-  //     // Check if the user's document already exists
-  //     const userDocSnap = await getDoc(userDocRef);
-
-  //     if (userDocSnap.exists()) {
-  //       // If the user document exists, load existing data
-  //       const userData = userDocSnap.data();
-  //       setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
-  //     } else {
-  //       // If the user document doesn't exist, create a new one
-  //       await setDoc(userDocRef, {
-  //         username: user.displayName,
-  //         email: user.email,
-  //         profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
-  //       });
-  //       setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
-  //     }
-
-  //     setUser(user); // Update the user state with the logged-in user's info
-  //   } catch (error) {
-  //     console.error("Error logging in with Google:", error);
-  //   }
-  // };
-
   const handleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
@@ -90,6 +80,7 @@ const ProductCard = ({ product }) => {
       if (userDocSnap.exists()) {
         // If the user document exists, load existing data
         const userData = userDocSnap.data();
+        setUserRole(userData.role || "user"); // Set user role from Firestore
         setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
       } else {
         // If the user document doesn't exist, create a new one
@@ -97,8 +88,10 @@ const ProductCard = ({ product }) => {
           username: user.displayName,
           email: user.email,
           profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
+          role: "user",
         });
         setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
+        setUserRole("user");
       }
 
       setUser(user); // Update the user state with the logged-in user's info
@@ -122,6 +115,7 @@ const ProductCard = ({ product }) => {
     navigate(`/product/${product.id}`, { state: { product } }); // Navigates to product detail
   };
 
+  const isAdmin = userRole === "admin"; // Check if the user is an admin
 
   return (
     <div className="border border-gray-300 rounded-lg p-4 shadow-sm relative bg-white">
@@ -160,8 +154,9 @@ const ProductCard = ({ product }) => {
         {/* Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          className="w-full py-2 border border-black text-black text-sm font-medium rounded-md bg-white hover:bg-gray-100"
-          disabled={added}
+          className={`w-full py-2 border border-black text-black text-sm font-medium rounded-md bg-white ${isAdmin ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"
+            }`}
+          disabled={added || isAdmin}
         >
           {added ? "Added to Cart" : "Add to Cart"}
         </button>
@@ -196,7 +191,9 @@ const ProductCard = ({ product }) => {
         {/* Buy Now Button */}
         <button
           onClick={handleBuyNow}
-          className="w-full py-2 border border-blue-600 text-blue-600 text-sm font-medium rounded-md bg-white hover:bg-blue-50"
+          className={`w-full py-2 border border-blue-600 text-blue-600 text-sm font-medium rounded-md bg-white ${isAdmin ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-50"
+            }`}
+          disabled={isAdmin}
         >
           Buy Now
         </button>

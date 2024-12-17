@@ -88,7 +88,16 @@ const UserDetails = () => {
                         className="w-24 h-24 rounded-full shadow-md"
                     />
                     <div>
-                        <h3 className="text-lg font-semibold">{userData.username}</h3>
+                        {/* <h3 className="text-lg font-semibold">{userData.username}</h3> */}
+                        <div className="flex items-center space-x-2">
+                            <h3 className="text-lg font-semibold">{userData.username}</h3>
+                            {/* Display Admin Tag if role is admin */}
+                            {userData.role === "admin" && (
+                                <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                    Admin
+                                </span>
+                            )}
+                        </div>
                         <p className="text-sm text-gray-600">{userData.email}</p>
                     </div>
                 </div>

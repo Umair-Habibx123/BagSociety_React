@@ -14,13 +14,14 @@ const CartPage = () => {
     const [profilePic, setProfilePic] = useState("/default-profile.png"); // Default profile picture  
     const [totalPrice, setTotalPrice] = useState(0);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [userRole, setUserRole] = useState("user"); // State to store the user's role
     const [selectAll, setSelectAll] = useState(false);
     const [loadingItem, setLoadingItem] = useState(null); // To track loading state for individual items
 
     useEffect(() => {
         if (currentUser) {
             const fetchCart = async () => {
-                const cartRef = doc(db, "userCart", currentUser.uid);
+                const cartRef = doc(db, "userCart", currentUser.email);
                 const cartDoc = await getDoc(cartRef);
 
                 if (cartDoc.exists()) {
@@ -40,34 +41,37 @@ const CartPage = () => {
 
     const handleSignIn = async () => {
         try {
-            const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
-            const user = result.user; // Get the logged-in user
-
-            // Reference to the user's document in Firestore using their email
-            const userDocRef = doc(db, "users", user.email);
-
-            // Check if the user's document already exists
-            const userDocSnap = await getDoc(userDocRef);
-
-            if (userDocSnap.exists()) {
-                // If the user document exists, load existing data
-                const userData = userDocSnap.data();
-                setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
-            } else {
-                // If the user document doesn't exist, create a new one
-                await setDoc(userDocRef, {
-                    username: user.displayName,
-                    email: user.email,
-                    profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
-                });
-                setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
-            }
-
-            setUser(user); // Update the user state with the logged-in user's info
+          const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
+          const user = result.user; // Get the logged-in user
+    
+          // Reference to the user's document in Firestore using their email
+          const userDocRef = doc(db, "users", user.email);
+    
+          // Check if the user's document already exists
+          const userDocSnap = await getDoc(userDocRef);
+    
+          if (userDocSnap.exists()) {
+            // If the user document exists, load existing data
+            const userData = userDocSnap.data();
+            setUserRole(userData.role || "user"); // Set user role from Firestore
+            setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
+          } else {
+            // If the user document doesn't exist, create a new one
+            await setDoc(userDocRef, {
+              username: user.displayName,
+              email: user.email,
+              profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
+              role: "user",
+            });
+            setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
+            setUserRole("user");
+          }
+    
+          setUser(user); // Update the user state with the logged-in user's info
         } catch (error) {
-            console.error("Error logging in with Google:", error);
+          console.error("Error logging in with Google:", error);
         }
-    };
+      };
 
     const handleRemoveItem = async (itemId) => {
         if (!currentUser) return;
@@ -76,7 +80,7 @@ const CartPage = () => {
         const updatedCart = cart.filter((item) => item.id !== itemId);
 
         try {
-            const cartRef = doc(db, "userCart", currentUser.uid);
+            const cartRef = doc(db, "userCart", currentUser.email);
             await setDoc(cartRef, { items: updatedCart });
             setCart(updatedCart);
             calculateTotalPrice(updatedCart, selectedItems);
@@ -98,7 +102,7 @@ const CartPage = () => {
         );
 
         try {
-            const cartRef = doc(db, "userCart", currentUser.uid);
+            const cartRef = doc(db, "userCart", currentUser.email);
             await setDoc(cartRef, { items: updatedCart });
             setCart(updatedCart);
             calculateTotalPrice(updatedCart, selectedItems);

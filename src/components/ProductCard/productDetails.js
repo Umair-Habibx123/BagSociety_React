@@ -11,6 +11,7 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [userRole, setUserRole] = useState("user"); // State to store the user's role
     const [added, setAdded] = useState(false); // State to track if item is added to cart
     const [showLoginPrompt, setShowLoginPrompt] = useState(false); // State to show login prompt
     const [loadingAddToCart, setLoadingAddToCart] = useState(false); // Loading state for adding to cart
@@ -57,34 +58,37 @@ const ProductDetail = () => {
 
     const handleSignIn = async () => {
         try {
-            const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
-            const user = result.user; // Get the logged-in user
-
-            // Reference to the user's document in Firestore using their email
-            const userDocRef = doc(db, "users", user.email);
-
-            // Check if the user's document already exists
-            const userDocSnap = await getDoc(userDocRef);
-
-            if (userDocSnap.exists()) {
-                // If the user document exists, load existing data
-                const userData = userDocSnap.data();
-                setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
-            } else {
-                // If the user document doesn't exist, create a new one
-                await setDoc(userDocRef, {
-                    username: user.displayName,
-                    email: user.email,
-                    profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
-                });
-                setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
-            }
-
-            setUser(user); // Update the user state with the logged-in user's info
+          const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
+          const user = result.user; // Get the logged-in user
+    
+          // Reference to the user's document in Firestore using their email
+          const userDocRef = doc(db, "users", user.email);
+    
+          // Check if the user's document already exists
+          const userDocSnap = await getDoc(userDocRef);
+    
+          if (userDocSnap.exists()) {
+            // If the user document exists, load existing data
+            const userData = userDocSnap.data();
+            setUserRole(userData.role || "user"); // Set user role from Firestore
+            setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
+          } else {
+            // If the user document doesn't exist, create a new one
+            await setDoc(userDocRef, {
+              username: user.displayName,
+              email: user.email,
+              profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
+              role: "user",
+            });
+            setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
+            setUserRole("user");
+          }
+    
+          setUser(user); // Update the user state with the logged-in user's info
         } catch (error) {
-            console.error("Error logging in with Google:", error);
+          console.error("Error logging in with Google:", error);
         }
-    };
+      };
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
