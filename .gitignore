@@ -26,4 +26,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # Firebase Admin SDK credentials (important: keep these private)
-bagsociety-firebase-adminsdk-gy00r-497e191bf3.json
+#bagsociety-firebase-adminsdk-gy00r-497e191bf3.json

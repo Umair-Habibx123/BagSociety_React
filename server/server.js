@@ -4,11 +4,8 @@ const app = express();
 const cors = require("cors");
 const admin = require("firebase-admin");
 
-// // Initialize Firebase Admin SDK
-// const serviceAccount = require("./bagsociety-firebase-adminsdk-gy00r-497e191bf3.json"); // Replace with the correct path
-
-// Initialize Firebase Admin SDK from the environment variable
-const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK_JSON);
+// Initialize Firebase Admin SDK
+const serviceAccount = require("./bagsociety-firebase-adminsdk-gy00r-497e191bf3.json"); // Replace with the correct path
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -22,8 +19,6 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Welcome to the API Server");
 });
-
-// Endpoint to delete a user by email
 app.post("/delete-user", async (req, res) => {
   const { email } = req.body;
 
@@ -48,6 +43,7 @@ app.post("/delete-user", async (req, res) => {
     res.status(500).json({ error: "Failed to delete user." });
   }
 });
+
 
 // Start the server
 const PORT = 5000;
