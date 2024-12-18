@@ -222,12 +222,12 @@ const CheckoutPage = () => {
             console.log("Email variables being passed to EmailJS:", emailVariables); // Log to check if order_details has valid HTML
 
             // Send confirmation email
-                 //     await emailjs.send(
-                 //         "service_wng6lvv", // Replace with your service ID
-                 //         "template_zmbrbjb", // Replace with your template ID
-                  //        emailVariables,
-                   //       "kkvWuOpN6HHfFs475" // Replace with your EmailJS user ID
-                  //    );
+            // await emailjs.send(
+            //     "service_wng6lvv", // Replace with your service ID
+            //     "template_zmbrbjb", // Replace with your template ID
+            //     emailVariables,
+            //     "kkvWuOpN6HHfFs475" // Replace with your EmailJS user ID
+            // );
 
             alert("Order placed successfully!");
 
@@ -426,9 +426,9 @@ const CheckoutPage = () => {
                 <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">Order Summary</h3>
                     <div className="bg-gray-100 p-4 rounded-lg">
-                        <p className="text-sm text-gray-700">Subtotal: ${subtotal.toFixed(2)}</p>
+                        <p className="text-sm text-gray-700">Subtotal: Rs.{subtotal.toFixed(2)}</p>
                         {/* <p className="text-sm text-gray-700">Shipping Fee: ${shippingFee.toFixed(2)}</p> */}
-                        <p className="text-lg font-semibold text-gray-800">Total: ${total.toFixed(2)}</p>
+                        <p className="text-lg font-semibold text-gray-800">Total: Rs.{total.toFixed(2)}</p>
                     </div>
                 </div>
 

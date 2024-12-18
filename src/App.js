@@ -140,7 +140,7 @@ function App() {
               }
             />
 
-<Route
+            <Route
               path="/admin-dashboard/addNewProducts"
               element={
                 <ProtectedRoute requiredRole="admin">
@@ -196,7 +196,6 @@ function App() {
               className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out"
             >
               <FaWhatsapp className="text-2xl" /> {/* WhatsApp Icon */}
-              <span>for any help</span> {/* Contact text */}
             </a>
           </div>
         </div>

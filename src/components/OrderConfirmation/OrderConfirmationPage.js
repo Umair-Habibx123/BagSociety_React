@@ -38,12 +38,12 @@ const OrderConfirmationPage = () => {
                             <div className="w-full sm:w-auto">
                                 <span className="font-semibold">{item.name}</span> <br />
                                 <span className="text-sm sm:text-base text-gray-500">
-                                    Original Price: ${item.price.toFixed(2)} x {item.quantity}
+                                    Original Price: Rs.{item.price.toFixed(2)} x {item.quantity}
                                 </span>
                             </div>
                             <div className="w-full sm:w-auto text-right">
                                 <span className="font-bold">
-                                    Total: ${(item.price * item.quantity).toFixed(2)}
+                                    Total: Rs.{(item.price * item.quantity).toFixed(2)}
                                 </span>
                             </div>
                         </li>
@@ -51,7 +51,7 @@ const OrderConfirmationPage = () => {
                 </ul>
 
                 <p className="mt-6 text-lg sm:text-xl font-bold">
-                    Grand Total: ${orderData?.total?.toFixed(2) || "0.00"}
+                    Grand Total: Rs.{orderData?.total?.toFixed(2) || "0.00"}
                 </p>
 
                 {/* New section for order inquiries */}

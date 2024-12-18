@@ -44,6 +44,8 @@ function Navbar() {
         });
         setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
         setUserRole("user");
+         // Reload the page to reflect changes
+    window.location.reload(); // This will refresh the website
       }
 
       setUser(user); // Update the user state with the logged-in user's info

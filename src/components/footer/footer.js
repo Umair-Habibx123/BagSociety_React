@@ -1,4 +1,5 @@
 import React from "react";
+import { FaCcAmex, FaCcDiscover, FaCcMastercard, FaCcVisa } from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -9,8 +10,8 @@ const Footer = () => {
           {/* Query Section */}
           <div>
             <h2 className="font-bold text-lg mb-4">Put your query at</h2>
-            <p>Whatsapp: +92-347-5391207</p>
-            <p>Email: cs@astore.pk</p>
+            <p>Whatsapp: +92-310-8026280</p>
+            <p>Email: bagsociety786@gmail.com</p>
             <p>Business hours: 24/7</p>
           </div>
           {/* Shop Section */}
@@ -19,9 +20,6 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>10.10 SALE</li>
               <li>Bags</li>
-              <li>Clothing Line</li>
-              <li>Accessories</li>
-              <li>Footwear</li>
               <li>Customer Reviews</li>
               <li>For Bulk Purchase</li>
               <li>Contact us</li>
@@ -45,7 +43,7 @@ const Footer = () => {
         <div className="mt-8 border-t border-gray-700 pt-4 flex flex-col md:flex-row justify-between items-center">
           {/* Left */}
           <p className="text-sm">
-            © 2024, Astore® Powered by Shopify · Refund policy · Privacy policy
+            © 2024, bag-Society® Powered by Bag-Society · Refund policy · Privacy policy
             · Terms of service · Contact information
           </p>
 
@@ -62,27 +60,19 @@ const Footer = () => {
 
             </div>
             {/* Payment Icons */}
+
+            {/* <div className="flex space-x-4">
+              <FaCcAmex className="h-6 w-6" title="Amex" />
+              <FaCcDiscover className="h-6 w-6" title="Discover" />
+              <FaCcMastercard className="h-6 w-6" title="Mastercard" />
+              <FaCcVisa className="h-6 w-6" title="Visa" />
+            </div> */}
+
             <div className="flex space-x-4">
-              <img
-                src="/path/to/amex.png"
-                alt="Amex"
-                className="h-6"
-              />
-              <img
-                src="/path/to/discover.png"
-                alt="Discover"
-                className="h-6"
-              />
-              <img
-                src="/path/to/mastercard.png"
-                alt="Mastercard"
-                className="h-6"
-              />
-              <img
-                src="/path/to/visa.png"
-                alt="Visa"
-                className="h-6"
-              />
+              <FaCcAmex className="h-6 w-6" title="Amex" style={{ color: "#2E77BC" }} />
+              <FaCcDiscover className="h-6 w-6" title="Discover" style={{ color: "#FF6000" }} />
+              <FaCcMastercard className="h-6 w-6" title="Mastercard" style={{ color: "#EB001B" }} />
+              <FaCcVisa className="h-6 w-6" title="Visa" style={{ color: "#1A1F71" }} />
             </div>
           </div>
         </div>

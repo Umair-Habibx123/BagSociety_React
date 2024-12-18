@@ -65,9 +65,12 @@ const CartPage = () => {
             });
             setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
             setUserRole("user");
+            
           }
     
           setUser(user); // Update the user state with the logged-in user's info
+           // Reload the page to reflect changes
+    window.location.reload(); // This will refresh the website
         } catch (error) {
           console.error("Error logging in with Google:", error);
         }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase"; // Make sure the path is correct
 import { db } from "../../firebase"; // Ensure this path is correct
 import { useUser } from "../../context/UserContext"; // Corrected import
@@ -17,8 +17,34 @@ const ProductDetail = () => {
     const [loadingAddToCart, setLoadingAddToCart] = useState(false); // Loading state for adding to cart
     const navigate = useNavigate(); // To navigate to other pages
     const [profilePic, setProfilePic] = useState("/default-profile.png");
-    const provider = new GoogleAuthProvider();
     const [user, setUser] = useState(null); // User state to manage logged-in user info
+
+    const provider = new GoogleAuthProvider();
+
+    // Monitor Firebase Auth state
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser); // Set the logged-in user
+
+                // Fetch user's role from Firestore
+                const userDocRef = doc(db, "users", currentUser.email);
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    setUserRole(userData.role || "user"); // Set role from Firestore
+                } else {
+                    console.error("User document does not exist.");
+                }
+
+            } else {
+                setUser(null); // No user is logged in
+            }
+        });
+
+        return () => unsubscribe(); // Cleanup the listener
+    }, []);
 
     useEffect(() => {
         if (!productId) {
@@ -58,37 +84,39 @@ const ProductDetail = () => {
 
     const handleSignIn = async () => {
         try {
-          const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
-          const user = result.user; // Get the logged-in user
-    
-          // Reference to the user's document in Firestore using their email
-          const userDocRef = doc(db, "users", user.email);
-    
-          // Check if the user's document already exists
-          const userDocSnap = await getDoc(userDocRef);
-    
-          if (userDocSnap.exists()) {
-            // If the user document exists, load existing data
-            const userData = userDocSnap.data();
-            setUserRole(userData.role || "user"); // Set user role from Firestore
-            setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
-          } else {
-            // If the user document doesn't exist, create a new one
-            await setDoc(userDocRef, {
-              username: user.displayName,
-              email: user.email,
-              profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
-              role: "user",
-            });
-            setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
-            setUserRole("user");
-          }
-    
-          setUser(user); // Update the user state with the logged-in user's info
+            const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
+            const user = result.user; // Get the logged-in user
+
+            // Reference to the user's document in Firestore using their email
+            const userDocRef = doc(db, "users", user.email);
+
+            // Check if the user's document already exists
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                // If the user document exists, load existing data
+                const userData = userDocSnap.data();
+                setUserRole(userData.role || "user"); // Set user role from Firestore
+                setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
+            } else {
+                // If the user document doesn't exist, create a new one
+                await setDoc(userDocRef, {
+                    username: user.displayName,
+                    email: user.email,
+                    profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
+                    role: "user",
+                });
+                setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
+                setUserRole("user");
+            }
+
+            setUser(user); // Update the user state with the logged-in user's info
+             // Reload the page to reflect changes
+    window.location.reload(); // This will refresh the website
         } catch (error) {
-          console.error("Error logging in with Google:", error);
+            console.error("Error logging in with Google:", error);
         }
-      };
+    };
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
@@ -180,8 +208,7 @@ const ProductDetail = () => {
                             </span>
                         )}
                     </div>
-                    <div className="space-y-4">
-                        {/* Add to Cart Button with dynamic styling */}
+                    {/* <div className="space-y-4">
                         <button
                             onClick={handleAddToCart}
                             className={`w-full py-3 font-bold rounded-lg transition-colors 
@@ -199,7 +226,37 @@ const ProductDetail = () => {
                             className="w-full py-3 border-2 border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-100 transition-colors">
                             Buy Now
                         </button>
+                    </div> */}
+                    <div className="space-y-4">
+                        {/* Add to Cart Button */}
+                        <button
+                            onClick={handleAddToCart}
+                            className={`w-full py-3 font-bold rounded-lg transition-colors 
+            ${userRole === "admin" || added ?
+                                    'bg-gray-300 text-gray-500 cursor-not-allowed' :
+                                    'bg-yellow-500 text-white hover:bg-yellow-600'}`}
+                            disabled={added || loadingAddToCart || userRole === "admin"}
+                        >
+                            {loadingAddToCart ? (
+                                <span>Loading...</span>
+                            ) : (
+                                added ? 'Added to Cart' : 'Add to Cart'
+                            )}
+                        </button>
+
+                        {/* Buy Now Button */}
+                        <button
+                            onClick={handleBuyNow}
+                            className={`w-full py-3 border-2 font-bold rounded-lg transition-colors 
+            ${userRole === "admin" ?
+                                    'border-gray-300 text-gray-500 bg-gray-100 cursor-not-allowed' :
+                                    'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                            disabled={userRole === "admin"}
+                        >
+                            Buy Now
+                        </button>
                     </div>
+
                 </div>
             </div>
 

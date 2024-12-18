@@ -186,13 +186,13 @@ function ShowUsers() {
                                     <p className="text-gray-600 text-center">{user.id}</p>
 
                                     {/* Delete icon */}
-                                    <button
+                                    {/* <button
                                         onClick={() => handleDeleteUser(user.id, user.id)}
                                         className="absolute top-2 right-2 text-red-600 hover:text-red-800"
                                         disabled={isDeleting}
                                     >
                                         <FaTrashAlt size={20} />
-                                    </button>
+                                    </button> */}
                                 </div>
                             ))
                         ) : (
