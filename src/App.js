@@ -25,6 +25,8 @@ import Forbidden from './components/AdminDashboard/Forbidden';
 import EditUsers from './components/AdminDashboard/EditUsers';
 import ShowProducts from './components/AdminDashboard/ShowProducts';
 import AddNewProduct from './components/AdminDashboard/AddProduct';
+import ManageOrders from './components/AdminDashboard/ManageOrders';
+import OrderDetailPage from './components/AdminDashboard/OrderDetailPage';
 
 // Component to scroll to the top
 function ScrollToTop() {
@@ -37,11 +39,6 @@ function ScrollToTop() {
   return null; // This component doesn't render anything
 }
 
-// Function to check if the checkout flow is complete
-function isCheckoutComplete() {
-  // Replace with actual logic to determine if the checkout is complete
-  return localStorage.getItem('checkoutComplete') === 'true';
-}
 
 function App() {
   return (
@@ -94,7 +91,7 @@ function App() {
 
             {/* Order Confirmation Page */}
             <Route path="/order-confirmation" element={
-              <OrderConfirmationPage /> 
+              <OrderConfirmationPage />
             } />
 
             {/* Admin Dashboard and Related Routes */}
@@ -115,6 +112,23 @@ function App() {
                 <ShowProducts />
               </ProtectedRoute>
             } />
+
+            <Route
+              path="/admin-dashboard/manageOrders"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <ManageOrders />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard/manageOrders/:userId/:orderId"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <OrderDetailPage />
+                </ProtectedRoute>
+              }
+            />
 
             <Route path="/admin-dashboard/editUsers" element={
               <ProtectedRoute requiredRole="admin">

@@ -24,7 +24,7 @@ function AdminDashboard() {
           <Link to="/admin-dashboard/showProducts">
             <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition text-center">
               <h2 className="text-xl font-bold mb-2 text-gray-800">Show/Edit Products</h2>
-              <p className="text-gray-600">View and Update product information of products.</p>
+              <p className="text-gray-600">View/Update product information.</p>
             </div>
           </Link>
 
@@ -40,6 +40,13 @@ function AdminDashboard() {
             <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition text-center">
               <h2 className="text-xl font-bold mb-2 text-gray-800">Edit Roles</h2>
               <p className="text-gray-600">Modify user and admins roles.</p>
+            </div>
+          </Link>
+
+          <Link to="/admin-dashboard/manageOrders">
+            <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition text-center">
+              <h2 className="text-xl font-bold mb-2 text-gray-800">Manage Orders</h2>
+              <p className="text-gray-600">Manage orders and their delivery status </p>
             </div>
           </Link>
 

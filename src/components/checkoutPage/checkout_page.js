@@ -201,7 +201,8 @@ const CheckoutPage = () => {
                 subtotal: parseFloat(subtotal) || 0,
                 total: parseFloat(total) || 0,
                 paymentMethod: paymentMethod || "cash",
-                status: "Pending",
+                paymentStatus: "Pending",
+                deliveryStatus: "Pending",
                 createdAt: new Date().toISOString(),
             };
 
@@ -274,12 +275,6 @@ const CheckoutPage = () => {
             throw error; // Rethrow the error to be caught in the handleCheckout function
         }
     };
-
-
-
-
-
-
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
