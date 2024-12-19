@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { db } from "../../firebase"; // Your firebase configuration file
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { FaUserCircle } from 'react-icons/fa'; // Import a default user icon from react-icons
-import image1 from '../../assets/images/WhatsApp Image 2024-11-22 at 17.14.26_aa94cea3.jpg';
+import image1 from '../../assets/images/logo.png';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +16,7 @@ function Navbar() {
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
+  const dropdownRef = useRef(null); // Ref for dropdown
 
 
   const handleSignIn = async () => {
@@ -44,8 +45,8 @@ function Navbar() {
         });
         setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
         setUserRole("user");
-         // Reload the page to reflect changes
-    window.location.reload(); // This will refresh the website
+        // Reload the page to reflect changes
+        window.location.reload(); // This will refresh the website
       }
 
       setUser(user); // Update the user state with the logged-in user's info
@@ -58,6 +59,23 @@ function Navbar() {
   const closeMenu = () => {
     setIsOpen(false); // Close the hamburger menu
   };
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
 
   // Listen for authentication state changes (check if the user is logged in or not)
@@ -87,7 +105,7 @@ function Navbar() {
     <nav className="bg-gray-800">
       <div className="w-full px-4 py-4 flex justify-between items-center">
         {/* Logo */}
-        <div className="flex items-center whitespace-nowrap">
+        {/* <div className="flex items-center whitespace-nowrap">
           <Link to="/" className="flex items-center">
             <img
               src={image1} // Replace with your actual image source
@@ -96,7 +114,20 @@ function Navbar() {
             />
             <span className="text-white text-2xl font-bold">BAG SOCIETY</span>
           </Link>
+        </div> */}
+        <div className="flex items-center whitespace-nowrap">
+          <Link to="/" className="flex items-center">
+            <img
+              src={image1} // Replace with your actual image source
+              alt="BAG SOCIETY Logo"
+              className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 mr-2"
+            />
+            <span className="text-white text-lg sm:text-xl lg:text-2xl font-bold">
+              BAG SOCIETY
+            </span>
+          </Link>
         </div>
+
 
         {/* Hamburger Menu for Mobile */}
         <div className="md:hidden ml-auto"> {/* Visible only on mobile screens */}

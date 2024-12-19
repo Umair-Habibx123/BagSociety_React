@@ -58,7 +58,7 @@ const SettingsPage = () => {
         setCurrentUser(user);
       } else {
         Swal.fire("Error", "No user is logged in!", "error");
-        navigate("/login"); // Redirect to login if no user is logged in
+        navigate("/"); // Redirect to login if no user is logged in
       }
     });
     return () => unsubscribe();

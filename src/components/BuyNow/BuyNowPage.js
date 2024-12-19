@@ -29,11 +29,21 @@ const BuyNowPage = () => {
 
   const user = useUser();
 
+  // useEffect(() => {
+  //   if (!product) {
+  //     navigate("/my-cart");
+  //   } else {
+  //     setTotalAmount(product?.discountedPrice ? product.discountedPrice * quantity : 0);
+  //   }
+  // }, [product, quantity, navigate]);
+
   useEffect(() => {
     if (!product) {
-      navigate("/cart");
+      navigate("/my-cart");
     } else {
-      setTotalAmount(product?.discountedPrice ? product.discountedPrice * quantity : 0);
+      setTotalAmount(
+        product?.discountedPrice ? product.discountedPrice * quantity : 0
+      );
     }
   }, [product, quantity, navigate]);
 
@@ -171,21 +181,41 @@ const BuyNowPage = () => {
   };
 
 
+  // const increaseQuantity = () => {
+  //   if (product && product.discountedPrice) {
+  //     setQuantity((prevQuantity) => {
+  //       const updatedQuantity = prevQuantity + 1;
+  //       setTotalAmount(product.discountedPrice * updatedQuantity);
+  //       return updatedQuantity;
+  //     });
+  //   }
+  // };
+
   const increaseQuantity = () => {
     if (product && product.discountedPrice) {
       setQuantity((prevQuantity) => {
         const updatedQuantity = prevQuantity + 1;
-        setTotalAmount(product.discountedPrice * updatedQuantity);
+        setTotalAmount((product.discountedPrice || 0) * updatedQuantity);
         return updatedQuantity;
       });
     }
   };
 
+  // const decreaseQuantity = () => {
+  //   if (product && product.discountedPrice && quantity > 1) {
+  //     setQuantity((prevQuantity) => {
+  //       const updatedQuantity = prevQuantity - 1;
+  //       setTotalAmount(product.discountedPrice * updatedQuantity);
+  //       return updatedQuantity;
+  //     });
+  //   }
+  // };
+
   const decreaseQuantity = () => {
     if (product && product.discountedPrice && quantity > 1) {
       setQuantity((prevQuantity) => {
         const updatedQuantity = prevQuantity - 1;
-        setTotalAmount(product.discountedPrice * updatedQuantity);
+        setTotalAmount((product.discountedPrice || 0) * updatedQuantity);
         return updatedQuantity;
       });
     }
@@ -209,9 +239,13 @@ const BuyNowPage = () => {
                 <span className="text-lg font-semibold">{quantity}</span>
                 <button onClick={increaseQuantity} className="p-2 bg-gray-300 rounded-lg text-lg">+</button>
               </div>
-              <p className="mt-2 text-gray-800 font-semibold">
+              {/* <p className="mt-2 text-gray-800 font-semibold">
                 Total Price: Rs. {totalAmount.toFixed(2)}
+              </p> */}
+              <p className="mt-2 text-gray-800 font-semibold">
+                Total Price: Rs. {Number(totalAmount).toFixed(2)}
               </p>
+
             </div>
           </div>
         </div>

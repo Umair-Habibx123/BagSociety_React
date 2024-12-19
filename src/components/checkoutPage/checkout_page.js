@@ -31,7 +31,7 @@ const CheckoutPage = () => {
 
     useEffect(() => {
         if (!selectedItems || selectedItems.length === 0) {
-            navigate("/cart");
+            navigate("/my-cart");
         } else {
             const newSubtotal = selectedItems.reduce((acc, item) => {
                 const price = typeof item.price === "number" ? item.price : parseFloat(item.price);
@@ -68,7 +68,7 @@ const CheckoutPage = () => {
                     }
                 })();
             } else {
-                navigate("/login");
+                navigate("/");
             }
         });
 
@@ -209,6 +209,7 @@ const CheckoutPage = () => {
 
             // Save order to Firestore and get the new order reference
             const newOrderRef = await saveOrderToFirestore(userEmail, orderData);
+
 
             // Prepare dynamic variables for the email template
             const emailVariables = {

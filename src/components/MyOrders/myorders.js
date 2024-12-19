@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { db } from "../../firebase"; // Firebase setup
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { useUser } from "../../context/UserContext";
@@ -6,24 +7,26 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const MyOrdersPage = () => {
     const currentUser = useUser(); // Get the logged-in user from context
+    const navigate = useNavigate(); // Initialize useNavigate for redirects
     const [orders, setOrders] = useState([]);
     const [userDetails, setUserDetails] = useState(null);
     const [loadingOrders, setLoadingOrders] = useState(true);
     const [loadingUserDetails, setLoadingUserDetails] = useState(true);
     const [userEmail, setUserEmail] = useState("");
 
-    // Get user email from Firebase Authentication
+    // Redirect non-logged-in users
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
             if (user) {
                 setUserEmail(user.email); // Set the email of the logged-in user
             } else {
                 console.error("No user is signed in");
+                navigate("/"); // Redirect to login page if not logged in
             }
         });
 
         return () => unsubscribe(); // Cleanup subscription on component unmount
-    }, []);
+    }, [navigate]);
 
     // Fetch user details
     useEffect(() => {
