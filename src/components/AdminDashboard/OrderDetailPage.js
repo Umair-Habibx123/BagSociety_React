@@ -255,10 +255,10 @@ function OrderDetailPage() {
                             </select>
                         </div>
                         <p className="text-gray-600">
-                            <strong>Subtotal:</strong> ${orderDetails.subtotal || "N/A"}
+                            <strong>Subtotal:</strong> Rs. {orderDetails.subtotal || "N/A"}
                         </p>
                         <p className="text-gray-600">
-                            <strong>Total:</strong> ${orderDetails.total || "N/A"}
+                            <strong>Total:</strong> Rs. {orderDetails.total || "N/A"}
                         </p>
                         <p className="text-gray-600">
                             <strong>Created At:</strong>{" "}
@@ -287,7 +287,7 @@ function OrderDetailPage() {
                                             {item.name || "Product Name"}
                                         </p>
                                         <p className="text-gray-600">
-                                            <strong>Price:</strong> ${item.price}
+                                            <strong>Price:</strong> Rs. {item.price}
                                         </p>
                                         <p className="text-gray-600">
                                             <strong>Quantity:</strong> {item.quantity}

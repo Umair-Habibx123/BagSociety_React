@@ -72,7 +72,8 @@ const MyOrdersPage = () => {
                         createdAt: orderData.createdAt,
                         items: orderData.items,
                         paymentMethod: orderData.paymentMethod,
-                        status: orderData.status,
+                        paymentStatus: orderData.paymentStatus,
+                        deliveryStatus: orderData.deliveryStatus,
                         subtotal: orderData.subtotal,
                         total: orderData.total
                     });
@@ -164,7 +165,8 @@ const MyOrdersPage = () => {
                                     <p className="text-sm text-gray-500">
                                         Payment Method: {order.paymentMethod}
                                     </p>
-                                    <p className="text-sm text-gray-500">Status: {order.status}</p>
+                                    <p className="text-sm text-gray-500">Delivery Status: {order.deliveryStatus}</p>
+                                    <p className="text-sm text-gray-500">Payment Status: {order.paymentStatus}</p>
                                 </div>
                             </div>
                         ))}

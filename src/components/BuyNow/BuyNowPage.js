@@ -157,6 +157,7 @@ const BuyNowPage = () => {
         price: parseFloat(product?.discountedPrice) || 0,
         quantity: quantity || 1,
         total: (parseFloat(product?.discountedPrice) * quantity).toFixed(2),
+        image: product?.image || "", // Include product image
       },
       totalAmount: totalAmount.toFixed(2),
       shippingAddress: address,
@@ -167,29 +168,30 @@ const BuyNowPage = () => {
 
     try {
       // Navigate to the CheckoutPage with order data
+      // navigate("/checkout", {
+      //   state: {
+
+      //     selectedItems: [orderData.product], // Pass the product details
+      //     totalAmount: parseFloat(orderData.totalAmount), // Total amount
+      //     shippingAddress: orderData.shippingAddress, // Address
+      //     productImage: orderData.product.image, // Include image for use in CheckoutPage
+      //   },
+      // });
+
       navigate("/checkout", {
         state: {
-          selectedItems: [orderData.product], // Pass the product details
+          selectedItems: [orderData.product], // Pass the product details as an array
           totalAmount: parseFloat(orderData.totalAmount), // Total amount
           shippingAddress: orderData.shippingAddress, // Address
+          productImage: [orderData.product.image], // Wrap the single image in an array
         },
       });
+
     } catch (error) {
       console.error("Error navigating to checkout page:", error);
       alert("Failed to proceed to checkout. Please try again.");
     }
   };
-
-
-  // const increaseQuantity = () => {
-  //   if (product && product.discountedPrice) {
-  //     setQuantity((prevQuantity) => {
-  //       const updatedQuantity = prevQuantity + 1;
-  //       setTotalAmount(product.discountedPrice * updatedQuantity);
-  //       return updatedQuantity;
-  //     });
-  //   }
-  // };
 
   const increaseQuantity = () => {
     if (product && product.discountedPrice) {
@@ -200,16 +202,6 @@ const BuyNowPage = () => {
       });
     }
   };
-
-  // const decreaseQuantity = () => {
-  //   if (product && product.discountedPrice && quantity > 1) {
-  //     setQuantity((prevQuantity) => {
-  //       const updatedQuantity = prevQuantity - 1;
-  //       setTotalAmount(product.discountedPrice * updatedQuantity);
-  //       return updatedQuantity;
-  //     });
-  //   }
-  // };
 
   const decreaseQuantity = () => {
     if (product && product.discountedPrice && quantity > 1) {

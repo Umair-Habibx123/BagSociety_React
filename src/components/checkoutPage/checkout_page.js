@@ -8,7 +8,11 @@ import emailjs from "emailjs-com";
 const CheckoutPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { selectedItems, totalAmount } = location.state || {};
+    const { selectedItems, totalAmount, productImage } = location.state || {
+        selectedItems: [],
+        productImage: [],
+        totalAmount: 0,
+    };
     const [subtotal, setSubtotal] = useState(0);
     // const [shippingFee, setShippingFee] = useState(1.99);
     const [total, setTotal] = useState(totalAmount || 0);
@@ -193,10 +197,11 @@ const CheckoutPage = () => {
                     username: username || "Unnamed user",
                     address: address || "Address not provided",
                 },
-                items: selectedItems.map((item) => ({
+                items: selectedItems.map((item, index) => ({
                     name: item.title || "Unnamed item",
                     price: parseFloat(item.price) || 0,
                     quantity: item.quantity || 1,
+                    image: productImage[index] || "",
                 })),
                 subtotal: parseFloat(subtotal) || 0,
                 total: parseFloat(total) || 0,

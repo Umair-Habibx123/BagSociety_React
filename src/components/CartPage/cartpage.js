@@ -41,40 +41,40 @@ const CartPage = () => {
 
     const handleSignIn = async () => {
         try {
-          const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
-          const user = result.user; // Get the logged-in user
-    
-          // Reference to the user's document in Firestore using their email
-          const userDocRef = doc(db, "users", user.email);
-    
-          // Check if the user's document already exists
-          const userDocSnap = await getDoc(userDocRef);
-    
-          if (userDocSnap.exists()) {
-            // If the user document exists, load existing data
-            const userData = userDocSnap.data();
-            setUserRole(userData.role || "user"); // Set user role from Firestore
-            setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
-          } else {
-            // If the user document doesn't exist, create a new one
-            await setDoc(userDocRef, {
-              username: user.displayName,
-              email: user.email,
-              profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
-              role: "user",
-            });
-            setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
-            setUserRole("user");
-            
-          }
-    
-          setUser(user); // Update the user state with the logged-in user's info
-           // Reload the page to reflect changes
-    window.location.reload(); // This will refresh the website
+            const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
+            const user = result.user; // Get the logged-in user
+
+            // Reference to the user's document in Firestore using their email
+            const userDocRef = doc(db, "users", user.email);
+
+            // Check if the user's document already exists
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                // If the user document exists, load existing data
+                const userData = userDocSnap.data();
+                setUserRole(userData.role || "user"); // Set user role from Firestore
+                setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
+            } else {
+                // If the user document doesn't exist, create a new one
+                await setDoc(userDocRef, {
+                    username: user.displayName,
+                    email: user.email,
+                    profilePic: user.photoURL || "/default-profile.png", // Set default photo if none exists
+                    role: "user",
+                });
+                setProfilePic(user.photoURL || "/default-profile.png"); // Set the profile picture
+                setUserRole("user");
+
+            }
+
+            setUser(user); // Update the user state with the logged-in user's info
+            // Reload the page to reflect changes
+            window.location.reload(); // This will refresh the website
         } catch (error) {
-          console.error("Error logging in with Google:", error);
+            console.error("Error logging in with Google:", error);
         }
-      };
+    };
 
     const handleRemoveItem = async (itemId) => {
         if (!currentUser) return;
@@ -239,7 +239,7 @@ const CartPage = () => {
                     <h2 className="text-lg font-bold text-gray-800 mb-4">Summary</h2>
                     <p className="text-xs md:text-sm text-gray-600 mb-4">Total items: {selectedItems.length}</p>
                     <p className="text-xl md:text-2xl text-gray-800 font-bold mb-4">Total: Rs. {totalPrice}</p>
-                    <Link
+                    {/* <Link
                         to="/checkout"
                         state={{
                             selectedItems: cart.filter((item) => selectedItems.includes(item.id)),
@@ -252,7 +252,24 @@ const CartPage = () => {
                         >
                             Checkout
                         </button>
+                    </Link> */}
+
+                    <Link
+                        to="/checkout"
+                        state={{
+                            selectedItems: cart.filter(item => selectedItems.includes(item.id)),
+                            productImage: cart.filter(item => selectedItems.includes(item.id)).map(item => item.image),
+                            totalAmount: totalPrice,
+                        }}
+                    >
+                        <button
+                            className={`w-full px-4 py-2 bg-pink-600 text-white font-bold rounded-md hover:bg-pink-700 disabled:bg-pink-300 disabled:cursor-not-allowed`}
+                            disabled={selectedItems.length === 0}
+                        >
+                            Checkout
+                        </button>
                     </Link>
+
                 </div>
             </div>
         </div>
@@ -260,3 +277,4 @@ const CartPage = () => {
 };
 
 export default CartPage;
+
