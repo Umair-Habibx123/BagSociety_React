@@ -42,23 +42,30 @@ const ProductsSection = () => {
   const firstFiveProducts = products.slice(0, 5);
 
   return (
-    <section className="py-8 px-4 bg-gray-100 w-full">
-      <div className="container mx-auto">
+    <section className="py-12 px-6 bg-gray-100 w-full">
+      <div className="container mx-auto max-w-screen-xl">
         {/* Header */}
-        <h2 className="text-2xl font-bold text-center mb-8">Products</h2>
+        <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 tracking-wide">
+          Our Products
+        </h2>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 animate__animated animate__fadeInUp">
           {firstFiveProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <div
+              key={product.id}
+              className="group relative transition-transform transform hover:scale-105 duration-300"
+            >
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
 
         {/* View All Button */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-12">
           <Link to="/all-products">
-            <button className="px-6 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800">
-              View All
+            <button className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300">
+              View All Products
             </button>
           </Link>
         </div>

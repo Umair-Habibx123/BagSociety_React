@@ -281,22 +281,27 @@ const CheckoutPage = () => {
         }
     };
 
+
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-4">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Checkout</h2>
+        <div className="p-4 sm:p-6 bg-gradient-to-br from-gray-100 to-white min-h-screen">
+            <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-4 sm:p-6">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 border-b pb-4">
+                    Checkout
+                </h2>
 
                 {/* Loading Indicator */}
                 {isLoading && (
                     <div className="flex justify-center items-center my-4">
-                        <div className="loader">Loading...</div> {/* You can use a spinner here */}
+                        <div className="loader animate-spin rounded-full h-8 w-8 border-t-4 border-blue-500"></div>
                     </div>
                 )}
 
                 {/* Shipping Address */}
                 <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Shipping Address</h3>
-                    <div className="p-4 border rounded-lg bg-gray-100">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">
+                        Shipping Address
+                    </h3>
+                    <div className="p-4 border border-dashed rounded-lg bg-gradient-to-br from-gray-50 to-gray-100">
                         {isAddressLoading ? (
                             <p className="text-sm text-gray-800">Loading address...</p>
                         ) : address ? (
@@ -304,7 +309,7 @@ const CheckoutPage = () => {
                                 <p className="text-sm text-gray-800">{address}</p>
                                 <p
                                     onClick={handleChangeAddress}
-                                    className="text-blue-600 text-sm cursor-pointer mt-2"
+                                    className="text-blue-600 hover:underline text-sm cursor-pointer mt-2"
                                 >
                                     Change Address
                                 </p>
@@ -312,7 +317,7 @@ const CheckoutPage = () => {
                         ) : (
                             <p
                                 onClick={() => setIsAddressFormVisible(true)}
-                                className="text-blue-600 text-center cursor-pointer"
+                                className="text-blue-600 hover:underline text-center cursor-pointer"
                             >
                                 Add New Address
                             </p>
@@ -320,25 +325,26 @@ const CheckoutPage = () => {
                     </div>
                 </div>
 
-                {/* Address Form - Show if isAddressFormVisible is true */}
+                {/* Address Form */}
                 {isAddressFormVisible && (
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Enter New Address</h3>
-                        <div className="space-y-4">
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
+                            Enter New Address
+                        </h3>
+                        <div className="space-y-4 animate-fadeIn">
                             <div>
                                 <label className="block text-sm text-gray-700">Country/Region*</label>
                                 <select
                                     name="country"
                                     value={newAddress.country}
                                     onChange={handleAddressInputChange}
-                                    className="w-full p-2 border rounded-lg"
+                                    className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
                                 >
                                     <option value="">Select Country</option>
-                                    {/* Add country options */}
                                     <option value="PAKISTAN">Pakistan</option>
                                 </select>
                             </div>
-                            <div className="flex gap-4">
+                            <div className="flex flex-col sm:flex-row gap-4">
                                 <div className="flex-1">
                                     <label className="block text-sm text-gray-700">First Name*</label>
                                     <input
@@ -346,7 +352,7 @@ const CheckoutPage = () => {
                                         name="firstName"
                                         value={newAddress.firstName}
                                         onChange={handleAddressInputChange}
-                                        className="w-full p-2 border rounded-lg"
+                                        className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
                                     />
                                 </div>
                                 <div className="flex-1">
@@ -356,7 +362,7 @@ const CheckoutPage = () => {
                                         name="lastName"
                                         value={newAddress.lastName}
                                         onChange={handleAddressInputChange}
-                                        className="w-full p-2 border rounded-lg"
+                                        className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
                                     />
                                 </div>
                             </div>
@@ -367,20 +373,20 @@ const CheckoutPage = () => {
                                     name="address"
                                     value={newAddress.address}
                                     onChange={handleAddressInputChange}
-                                    className="w-full p-2 border rounded-lg"
+                                    className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm text-gray-700">Apartment*</label>
+                                <label className="block text-sm text-gray-700">Apartment</label>
                                 <input
                                     type="text"
                                     name="apartment"
                                     value={newAddress.apartment}
                                     onChange={handleAddressInputChange}
-                                    className="w-full p-2 border rounded-lg"
+                                    className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
                                 />
                             </div>
-                            <div className="flex gap-4">
+                            <div className="flex flex-col sm:flex-row gap-4">
                                 <div className="flex-1">
                                     <label className="block text-sm text-gray-700">City*</label>
                                     <input
@@ -388,7 +394,7 @@ const CheckoutPage = () => {
                                         name="city"
                                         value={newAddress.city}
                                         onChange={handleAddressInputChange}
-                                        className="w-full p-2 border rounded-lg"
+                                        className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
                                     />
                                 </div>
                                 <div className="flex-1">
@@ -398,7 +404,7 @@ const CheckoutPage = () => {
                                         name="postalCode"
                                         value={newAddress.postalCode}
                                         onChange={handleAddressInputChange}
-                                        className="w-full p-2 border rounded-lg"
+                                        className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
                                     />
                                 </div>
                             </div>
@@ -409,12 +415,12 @@ const CheckoutPage = () => {
                                     name="phone"
                                     value={newAddress.phone}
                                     onChange={handleAddressInputChange}
-                                    className="w-full p-2 border rounded-lg"
+                                    className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
                                 />
                             </div>
                             <button
                                 onClick={handleSaveAddress}
-                                className="w-full bg-blue-600 text-white p-2 rounded-lg"
+                                className="w-full p-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow hover:scale-105 transition-transform"
                             >
                                 Save Address
                             </button>
@@ -422,44 +428,49 @@ const CheckoutPage = () => {
                     </div>
                 )}
 
-
                 {/* Order Summary */}
                 <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Order Summary</h3>
-                    <div className="bg-gray-100 p-4 rounded-lg">
-                        <p className="text-sm text-gray-700">Subtotal: Rs.{subtotal.toFixed(2)}</p>
-                        {/* <p className="text-sm text-gray-700">Shipping Fee: ${shippingFee.toFixed(2)}</p> */}
-                        <p className="text-lg font-semibold text-gray-800">Total: Rs.{total.toFixed(2)}</p>
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
+                        Order Summary
+                    </h3>
+                    <div className="p-4 bg-gray-50 rounded-lg shadow-sm">
+                        <p className="text-sm text-gray-600 mb-1">
+                            Subtotal: <span className="font-medium">Rs.{subtotal.toFixed(2)}</span>
+                        </p>
+                        <p className="text-lg font-semibold text-gray-800">
+                            Total: <span className="text-blue-600">Rs.{total.toFixed(2)}</span>
+                        </p>
                     </div>
                 </div>
 
                 {/* Payment Method */}
                 <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Payment Method</h3>
-                    <div>
-                        <label className="flex items-center">
-                            <input
-                                type="radio"
-                                name="paymentMethod"
-                                value="cash"
-                                checked={paymentMethod === "cash"}
-                                onChange={(e) => setPaymentMethod(e.target.value)}
-                                className="mr-2"
-                            />
-                            Cash on Delivery
-                        </label>
-                    </div>
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
+                        Payment Method
+                    </h3>
+                    <label className="flex items-center cursor-pointer">
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="cash"
+                            checked={paymentMethod === "cash"}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="form-radio mr-2 text-blue-500 focus:ring focus:ring-blue-300"
+                        />
+                        Cash on Delivery
+                    </label>
                 </div>
 
                 <button
                     onClick={handleCheckout}
-                    className="w-full bg-green-600 text-white p-2 rounded-lg mt-4"
+                    className="w-full p-2 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg shadow-lg hover:scale-105 transition-transform mt-4"
                 >
                     Place Order
                 </button>
             </div>
         </div>
     );
+
 };
 
 export default CheckoutPage;

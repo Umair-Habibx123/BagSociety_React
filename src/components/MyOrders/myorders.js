@@ -115,13 +115,15 @@ const MyOrdersPage = () => {
         <div className="p-4 bg-gray-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 gap-6">
-                    <div className="bg-white shadow-md rounded-lg p-4 sm:p-6">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">My Orders</h2>
+                    <div className="bg-white shadow-lg rounded-xl p-6 sm:p-8 animate__animated animate__fadeIn">
+                        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center animate__animated animate__fadeIn">
+                            My Orders
+                        </h2>
 
                         {/* Display user details */}
                         {userDetails && (
-                            <div className="mb-4 p-4 bg-gray-100 rounded-lg">
-                                <h3 className="text-lg font-semibold text-gray-800">User Information</h3>
+                            <div className="mb-6 p-6 bg-gray-100 rounded-lg shadow-md">
+                                <h3 className="text-xl font-semibold text-gray-800 mb-2">User Information</h3>
                                 <p className="text-gray-600">Username: {userDetails.username}</p>
                                 <p className="text-gray-600">Email: {userDetails.email}</p>
                             </div>
@@ -131,17 +133,15 @@ const MyOrdersPage = () => {
                         {orders.map((order) => (
                             <div
                                 key={order.id}
-                                className="mb-6 p-4 border rounded-lg shadow-sm bg-white"
+                                className="mb-8 p-6 border rounded-lg shadow-lg bg-white transform hover:scale-105 transition-transform duration-300"
                             >
-                                <h3 className="text-lg font-semibold text-gray-800 break-all">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2 break-all">
                                     Order ID: {order.id}
                                 </h3>
                                 <p className="text-sm text-gray-500">Placed on: {order.createdAt}</p>
-                                <div className="mt-4">
-                                    <h4 className="text-base font-semibold text-gray-700">
-                                        Items
-                                    </h4>
-                                    <ul className="space-y-2">
+                                <div className="mt-6">
+                                    <h4 className="text-base font-semibold text-gray-700">Items</h4>
+                                    <ul className="space-y-3">
                                         {order.items.map((item, index) => (
                                             <li
                                                 key={index}
@@ -155,16 +155,10 @@ const MyOrdersPage = () => {
                                         ))}
                                     </ul>
                                 </div>
-                                <div className="mt-4">
-                                    <p className="text-lg font-semibold text-gray-700">
-                                        Subtotal: Rs. {order.subtotal}
-                                    </p>
-                                    <p className="text-lg font-semibold text-gray-700">
-                                        Total: Rs. {order.total}
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                        Payment Method: {order.paymentMethod}
-                                    </p>
+                                <div className="mt-6">
+                                    <p className="text-lg font-semibold text-gray-700">Subtotal: Rs. {order.subtotal}</p>
+                                    <p className="text-lg font-semibold text-gray-700">Total: Rs. {order.total}</p>
+                                    <p className="text-sm text-gray-500">Payment Method: {order.paymentMethod}</p>
                                     <p className="text-sm text-gray-500">Delivery Status: {order.deliveryStatus}</p>
                                     <p className="text-sm text-gray-500">Payment Status: {order.paymentStatus}</p>
                                 </div>

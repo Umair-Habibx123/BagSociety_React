@@ -7,7 +7,7 @@ const ContactUsForm = () => {
         message: ''
     });
 
-    const [showModal, setShowModal] = useState(false); // To control the modal visibility
+    const [showModal, setShowModal] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -20,10 +20,8 @@ const ContactUsForm = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Replace {your-form-id} with your actual Formspree ID
         const formAction = 'https://formspree.io/f/xbljkbnn';
 
-        // Submit form via Formspree
         fetch(formAction, {
             method: 'POST',
             headers: {
@@ -33,7 +31,7 @@ const ContactUsForm = () => {
         })
             .then((response) => {
                 if (response.ok) {
-                    setShowModal(true); // Show the modal on success
+                    setShowModal(true);
                 } else {
                     alert('There was an error sending your message.');
                 }
@@ -44,12 +42,15 @@ const ContactUsForm = () => {
     };
 
     return (
+        // bg-gradient-to-br from-blue-50 to-blue-100 py-12 px-4 sm:px-6 lg:px-8
         <section className="bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
-                <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">Contact Us</h2>
+            <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-2xl p-8 sm:p-10">
+                <h2 className="text-3xl font-bold text-gray-800 text-center mb-8 animate__animated animate__fadeIn">
+                    Contact Us
+                </h2>
 
                 {/* Form Start */}
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6 animate__animated animate__fadeIn">
                     {/* Email Field */}
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">Your Email</label>
@@ -58,7 +59,7 @@ const ContactUsForm = () => {
                             id="email"
                             name="email"
                             required
-                            className="mt-2 p-3 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="mt-2 p-3 w-full border border-gray-300 rounded-md shadow-md focus:ring-2 focus:ring-blue-500 transition-all duration-300 hover:ring-2 hover:ring-blue-400"
                             placeholder="Enter your email"
                             value={formData.email}
                             onChange={handleChange}
@@ -72,14 +73,13 @@ const ContactUsForm = () => {
                             id="problem"
                             name="problem"
                             required
-                            className="mt-2 p-3 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="mt-2 p-3 w-full border border-gray-300 rounded-md shadow-md focus:ring-2 focus:ring-blue-500 transition-all duration-300 hover:ring-2 hover:ring-blue-400"
                             value={formData.problem}
                             onChange={handleChange}
                         >
                             <option value="" disabled selected>Select your problem</option>
                             <option value="Orders Issue">Technical Issue</option>
                             <option value="Account Issue">Account Issue</option>
-                            <option value="Billing">Billing</option>
                             <option value="General Inquiry">General Inquiry</option>
                         </select>
                     </div>
@@ -92,7 +92,7 @@ const ContactUsForm = () => {
                             name="message"
                             required
                             rows="4"
-                            className="mt-2 p-3 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="mt-2 p-3 w-full border border-gray-300 rounded-md shadow-md focus:ring-2 focus:ring-blue-500 transition-all duration-300 hover:ring-2 hover:ring-blue-400"
                             placeholder="Enter your message"
                             value={formData.message}
                             onChange={handleChange}
@@ -103,7 +103,7 @@ const ContactUsForm = () => {
                     <div className="text-center">
                         <button
                             type="submit"
-                            className="py-3 px-6 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="py-3 px-6 bg-blue-600 text-white font-semibold rounded-md shadow-md transition-all duration-300 transform hover:bg-blue-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             Submit
                         </button>
@@ -113,14 +113,14 @@ const ContactUsForm = () => {
 
                 {/* Modal Dialog */}
                 {showModal && (
-                    <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50">
-                        <div className="bg-white p-6 rounded-md shadow-lg max-w-sm w-full">
+                    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 transition-all duration-500">
+                        <div className="bg-white p-6 rounded-md shadow-xl max-w-sm w-full animate__animated animate__fadeIn">
                             <h2 className="text-xl font-semibold text-gray-800 mb-4">Thanks for contacting us!</h2>
                             <p className="text-gray-600">We appreciate you reaching out. Our team will get back to you shortly.</p>
                             <div className="mt-6 text-center">
                                 <button
                                     onClick={() => setShowModal(false)} 
-                                    className="py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none"
+                                    className="py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-md transition-all duration-300 hover:bg-blue-700"
                                 >
                                     Close
                                 </button>

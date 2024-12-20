@@ -16,7 +16,8 @@ function Navbar() {
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
-  const dropdownRef = useRef(null); // Ref for dropdown
+  const navRef = useRef(null); // Ref for entire navbar
+  const dropdownRef = useRef(null); // Ref for dropdown container
 
 
   const handleSignIn = async () => {
@@ -35,6 +36,7 @@ function Navbar() {
         const userData = userDocSnap.data();
         setUserRole(userData.role || "user"); // Set user role from Firestore
         setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
+        window.location.reload(); // This will refresh the website
       } else {
         // If the user document doesn't exist, create a new one
         await setDoc(userDocRef, {
@@ -55,25 +57,29 @@ function Navbar() {
     }
   };
 
-  // Function to close the hamburger menu when a link is clicked
-  const closeMenu = () => {
-    setIsOpen(false); // Close the hamburger menu
-  };
+  const closeMenu = () => setIsOpen(false);
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
+        !dropdownRef.current.contains(event.target) &&
+        !navRef.current.contains(event.target)
       ) {
         setIsDropdownOpen(false);
       }
     };
 
+    const handleScroll = () => {
+      setIsDropdownOpen(false);
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("scroll", handleScroll);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -105,16 +111,6 @@ function Navbar() {
     <nav className="bg-gray-800">
       <div className="w-full px-4 py-4 flex justify-between items-center">
         {/* Logo */}
-        {/* <div className="flex items-center whitespace-nowrap">
-          <Link to="/" className="flex items-center">
-            <img
-              src={image1} // Replace with your actual image source
-              alt="BAG SOCIETY Logo"
-              className="w-12 h-12 mr-2"
-            />
-            <span className="text-white text-2xl font-bold">BAG SOCIETY</span>
-          </Link>
-        </div> */}
         <div className="flex items-center whitespace-nowrap">
           <Link to="/" className="flex items-center">
             <img
@@ -167,31 +163,44 @@ function Navbar() {
               src={profilePic} // Profile pic for mobile
               alt="Profile"
               className="w-8 h-8 rounded-full cursor-pointer"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle the dropdown menu
+              onClick={() => setIsDropdownOpen((prev) => !prev)} // Toggle the dropdown menu
             />
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg text-black z-50" onClick={closeMenu}>
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg text-black z-50">
                 {/* Mobile dropdown options */}
-                <Link
-                  to="/setting"
-                >
-                  <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100" onClick={closeMenu}>
+                <Link to="/setting">
+                  <button
+                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
+                    onClick={() => {
+                      closeMenu();
+                      setIsDropdownOpen(false);
+                    }}
+                  >
                     View Profile
                   </button>
                 </Link>
 
-                <Link
-                  to="/MyOrders"
-                >
+                <Link to="/MyOrders">
                   <button
-                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100" onClick={closeMenu}>
+                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
+                    onClick={() => {
+                      closeMenu();
+                      setIsDropdownOpen(false);
+                    }}
+                  >
                     My Orders
                   </button>
                 </Link>
 
-                {userRole === "admin" && ( // Show Admin Dashboard for admins only
+                {userRole === "admin" && (
                   <Link to="/admin-dashboard">
-                    <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
+                    <button
+                      className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
+                      onClick={() => {
+                        closeMenu();
+                        setIsDropdownOpen(false);
+                      }}
+                    >
                       Admin Dashboard
                     </button>
                   </Link>
@@ -204,13 +213,15 @@ function Navbar() {
                     setIsDropdownOpen(false); // Close the dropdown
                     navigate("/");
                   }}
-                  className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100" >
+                  className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
+                >
                   Logout
                 </button>
               </div>
             )}
           </div>
         )}
+
 
         {/* Navigation Links */}
         <ul
@@ -259,7 +270,8 @@ function Navbar() {
                 src={profilePic} // Use the profile picture fetched from Firestore
                 alt="Profile"
                 className="w-12 h-10 rounded-full cursor-pointer"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle the dropdown menu
+                // onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle the dropdown menu
+                onClick={() => setIsDropdownOpen((prev) => !prev)}
               />
               {/* Dropdown Menu for Profile */}
               {isDropdownOpen && (
@@ -267,7 +279,10 @@ function Navbar() {
                   <Link
                     to="/setting"
                   >
-                    <button
+                    <button onClick={() => {
+                      closeMenu();
+                      setIsDropdownOpen(false);
+                    }}
                       className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
                     >
                       View Profile
@@ -277,7 +292,10 @@ function Navbar() {
                   <Link
                     to="/MyOrders"
                   >
-                    <button
+                    <button onClick={() => {
+                      closeMenu();
+                      setIsDropdownOpen(false);
+                    }}
                       className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
                     >
                       My Orders
@@ -286,7 +304,11 @@ function Navbar() {
 
                   {userRole === "admin" && ( // Show Admin Dashboard for admins only
                     <Link to="/admin-dashboard">
-                      <button className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
+                      <button onClick={() => {
+                      closeMenu();
+                      setIsDropdownOpen(false);
+                    }}
+                      className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
                         Admin Dashboard
                       </button>
                     </Link>
@@ -298,6 +320,7 @@ function Navbar() {
                       setUser(null); // Set user state to null when logging out
                       setIsDropdownOpen(false); // Close the dropdown
                       navigate("/");
+                      closeMenu();
                       window.location.reload(); // Refresh the page to clear any remaining data
                     }}
                     className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"

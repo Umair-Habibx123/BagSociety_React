@@ -29,14 +29,6 @@ const BuyNowPage = () => {
 
   const user = useUser();
 
-  // useEffect(() => {
-  //   if (!product) {
-  //     navigate("/my-cart");
-  //   } else {
-  //     setTotalAmount(product?.discountedPrice ? product.discountedPrice * quantity : 0);
-  //   }
-  // }, [product, quantity, navigate]);
-
   useEffect(() => {
     if (!product) {
       navigate("/my-cart");
@@ -167,16 +159,6 @@ const BuyNowPage = () => {
     console.log("Order data being saved:", orderData); // Debugging log
 
     try {
-      // Navigate to the CheckoutPage with order data
-      // navigate("/checkout", {
-      //   state: {
-
-      //     selectedItems: [orderData.product], // Pass the product details
-      //     totalAmount: parseFloat(orderData.totalAmount), // Total amount
-      //     shippingAddress: orderData.shippingAddress, // Address
-      //     productImage: orderData.product.image, // Include image for use in CheckoutPage
-      //   },
-      // });
 
       navigate("/checkout", {
         state: {
@@ -213,31 +195,40 @@ const BuyNowPage = () => {
     }
   };
 
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Buy Now</h2>
+    <div className="p-6 sm:p-8 lg:p-12 bg-gray-50 min-h-screen">
+      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 md:p-8 transition-transform transform hover:scale-105 hover:shadow-xl duration-300">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">Buy Now</h2>
 
         {/* Product Details */}
-        <div className="mb-6">
+        <div className="mb-6 bg-gray-100 p-4 rounded-lg shadow-md animate__animated animate__fadeIn">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Product Details</h3>
-          <div className="bg-gray-100 p-4 rounded-lg flex flex-col md:flex-row items-center gap-4">
-            <img src={product?.image} alt={product?.title} className="w-40 h-40 object-cover rounded-md" />
-            <div>
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <img
+              src={product?.image}
+              alt={product?.title}
+              className="w-40 h-40 object-cover rounded-md transition-all transform hover:scale-105 duration-200"
+            />
+            <div className="flex-1">
               <p className="text-base text-gray-800 font-semibold">{product?.title}</p>
               <p className="text-sm text-gray-600">Price: Rs. {product?.discountedPrice}</p>
               <div className="flex items-center gap-4 mt-4">
-                <button onClick={decreaseQuantity} className="p-2 bg-gray-300 rounded-lg text-lg">-</button>
+                <button
+                  onClick={decreaseQuantity}
+                  className="p-2 bg-gray-300 rounded-lg text-lg hover:bg-gray-400"
+                >
+                  -
+                </button>
                 <span className="text-lg font-semibold">{quantity}</span>
-                <button onClick={increaseQuantity} className="p-2 bg-gray-300 rounded-lg text-lg">+</button>
+                <button
+                  onClick={increaseQuantity}
+                  className="p-2 bg-gray-300 rounded-lg text-lg hover:bg-gray-400"
+                >
+                  +
+                </button>
               </div>
-              {/* <p className="mt-2 text-gray-800 font-semibold">
-                Total Price: Rs. {totalAmount.toFixed(2)}
-              </p> */}
-              <p className="mt-2 text-gray-800 font-semibold">
-                Total Price: Rs. {Number(totalAmount).toFixed(2)}
-              </p>
-
+              <p className="mt-2 text-gray-800 font-semibold">Total Price: Rs. {Number(totalAmount).toFixed(2)}</p>
             </div>
           </div>
         </div>
@@ -245,7 +236,7 @@ const BuyNowPage = () => {
         {/* Shipping Address */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Shipping Address</h3>
-          <div className="p-4 border rounded-lg bg-gray-100">
+          <div className="p-4 border rounded-lg bg-gray-100 transition-all hover:scale-105 duration-300">
             {isAddressLoading ? (
               <p className="text-sm text-gray-800">Loading address...</p>
             ) : address ? (
@@ -253,7 +244,7 @@ const BuyNowPage = () => {
                 <p className="text-sm text-gray-800">{address}</p>
                 <p
                   onClick={handleChangeAddress}
-                  className="text-blue-600 text-sm cursor-pointer mt-2"
+                  className="text-blue-600 text-sm cursor-pointer mt-2 hover:text-blue-500 transition-all"
                 >
                   Change Address
                 </p>
@@ -261,7 +252,7 @@ const BuyNowPage = () => {
             ) : (
               <p
                 onClick={() => setIsAddressFormVisible(true)}
-                className="text-blue-600 text-center cursor-pointer"
+                className="text-blue-600 text-center cursor-pointer hover:text-blue-500 transition-all"
               >
                 Add New Address
               </p>
@@ -280,10 +271,9 @@ const BuyNowPage = () => {
                   name="country"
                   value={newAddress.country}
                   onChange={handleAddressInputChange}
-                  className="w-full p-2 border rounded-lg"
+                  className="w-full p-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select Country</option>
-                  {/* Add country options */}
                   <option value="PAKISTAN">Pakistan</option>
                 </select>
               </div>
@@ -363,7 +353,7 @@ const BuyNowPage = () => {
               </div>
               <button
                 onClick={handleSaveAddress}
-                className="w-full bg-blue-600 text-white p-2 rounded-lg"
+                className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all duration-200"
               >
                 Save Address
               </button>
@@ -374,7 +364,7 @@ const BuyNowPage = () => {
         {/* Payment Method */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Payment Method</h3>
-          <div className="bg-gray-100 p-4 rounded-lg">
+          <div className="bg-gray-100 p-4 rounded-lg transition-all hover:scale-105 duration-300">
             <label className="flex items-center space-x-3">
               <input type="radio" checked readOnly className="form-radio h-5 w-5 text-blue-600" />
               <span className="text-sm text-gray-800">Cash on Delivery</span>
@@ -382,12 +372,17 @@ const BuyNowPage = () => {
           </div>
         </div>
 
-        <button onClick={handleCheckout} className="w-full p-2 bg-blue-600 text-white rounded-md">
+        {/* Place Order Button */}
+        <button
+          onClick={handleCheckout}
+          className="w-full p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all duration-200"
+        >
           Place Order
         </button>
       </div>
     </div>
   );
+
 };
 
 export default BuyNowPage;

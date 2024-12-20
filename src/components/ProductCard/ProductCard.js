@@ -1,9 +1,9 @@
-import React, { useState, useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import { db } from "../../firebase";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useUser } from "../../context/UserContext"; // Assuming you have a context for the user
-import { Link, useNavigate } from "react-router-dom"; // Importing useNavigate for programmatic navigation
+import { useNavigate } from "react-router-dom"; // Importing useNavigate for programmatic navigation
 
 const ProductCard = ({ product }) => {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false); // State for the login prompt modal
@@ -13,7 +13,10 @@ const ProductCard = ({ product }) => {
   const [profilePic, setProfilePic] = useState("/default-profile.png"); // Default profile picture
   const [userState, setUserState] = useState(null); // User state to manage logged-in user info
   const [userRole, setUserRole] = useState("user"); // State to store the user's role
+  const [isHovered, setIsHovered] = useState(false);
 
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate(); // Initialize the useNavigate hook
@@ -54,8 +57,21 @@ const ProductCard = ({ product }) => {
         updatedCart = cartDoc.data().items;
       }
 
-      // Add item to cart
-      updatedCart.push({ id: product.id, title: product.title, price: product.discountedPrice, image: product.image });
+      // Check if the product already exists in the cart
+      const productIndex = updatedCart.findIndex((item) => item.id === product.id);
+      if (productIndex > -1) {
+        // If the product exists, increase its quantity
+        updatedCart[productIndex].quantity = (updatedCart[productIndex].quantity || 1) + 1;
+      } else {
+        // Add new product with quantity 1
+        updatedCart.push({
+          id: product.id,
+          title: product.title,
+          price: product.discountedPrice,
+          image: product.image,
+          quantity: 1,
+        });
+      }
 
       // Update cart in Firestore
       await setDoc(cartRef, { items: updatedCart });
@@ -65,6 +81,7 @@ const ProductCard = ({ product }) => {
       console.error("Error adding to cart: ", error);
     }
   };
+
 
   const handleSignIn = async () => {
     try {
@@ -82,6 +99,7 @@ const ProductCard = ({ product }) => {
         const userData = userDocSnap.data();
         setUserRole(userData.role || "user"); // Set user role from Firestore
         setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
+        window.location.reload(); // This will refresh the website
       } else {
         // If the user document doesn't exist, create a new one
         await setDoc(userDocRef, {
@@ -95,8 +113,8 @@ const ProductCard = ({ product }) => {
       }
 
       setUser(user); // Update the user state with the logged-in user's info
-       // Reload the page to reflect changes
-    window.location.reload(); // This will refresh the website
+      // Reload the page to reflect changes
+      window.location.reload(); // This will refresh the website
     } catch (error) {
       console.error("Error logging in with Google:", error);
     }
@@ -119,25 +137,124 @@ const ProductCard = ({ product }) => {
 
   const isAdmin = userRole === "admin"; // Check if the user is an admin
 
+  // return (
+  //   <div className="border border-gray-300 rounded-lg p-4 shadow-sm relative bg-white">
+
+
+  //     {/* Product Image */}
+  //     <div className="relative w-full h-48 overflow-hidden rounded-md">
+  //       <img
+  //         onClick={handleCardClick}
+  //         src={isHovered ? product.image2 : product.image}
+  //         alt={product.title}
+  //         className={`w-full h-full object-cover transition-transform duration-500 ease-in-out ${isHovered ? "scale-110 opacity-80" : "scale-100 opacity-100"
+  //           }`}
+  //         onMouseEnter={handleMouseEnter}
+  //         onMouseLeave={handleMouseLeave}
+  //       />
+  //     </div>
+
+  //     {/* Sale Badge */}
+  //     <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+  //       50% off
+  //     </div>
+
+  //     {/* Product Info */}
+  //     <div className="mt-4">
+  //       {/* Title Section: Fixed Height */}
+  //       <h3 className="text-sm font-medium text-gray-700 h-10 overflow-hidden">
+  //         {product.title}
+  //       </h3>
+  //       {/* Pricing Section */}
+
+  //       <div className="flex items-center mt-2">
+  //         <span className="text-sm text-gray-400 line-through mr-2">
+  //           Rs. {product.originalPrice}
+  //         </span>
+  //         <span className="text-sm text-red-600 font-bold">
+  //           Rs. {product.discountedPrice}
+  //         </span>
+  //       </div>
+
+  //     </div>
+
+
+  //     {/* Buttons Section */}
+  //     <div className="mt-4 flex space-x-4">
+  //       {/* Add to Cart Button */}
+  //       <button
+  //         onClick={handleAddToCart}
+  //         className={`w-full py-2 border border-black text-black text-sm font-medium rounded-md bg-white ${isAdmin ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"
+  //           }`}
+  //         disabled={added || isAdmin}
+  //       >
+  //         {added ? "Added to Cart" : "Add to Cart"}
+  //       </button>
+
+  //       {showLoginPrompt && (
+  //         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+  //           <div className="bg-white p-6 rounded-md shadow-lg max-w-md text-center">
+  //             <h2 className="text-lg font-semibold text-gray-800 mb-4">Login Required</h2>
+  //             <p className="text-gray-600 mb-6">
+  //               Please log in to add items to your cart and continue shopping.
+  //             </p>
+  //             <button
+  //               onClick={() => setShowLoginPrompt(false)} // Close the modal
+  //               className="px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 mr-2"
+  //             >
+  //               Cancel
+  //             </button>
+  //             <button
+  //               onClick={() => {
+  //                 setShowLoginPrompt(false);
+  //                 handleSignIn();
+  //                 // Redirect to login page (replace with your login logic)
+  //               }}
+  //               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+  //             >
+  //               Login
+  //             </button>
+  //           </div>
+  //         </div>
+  //       )}
+
+  //       {/* Buy Now Button */}
+  //       <button
+  //         onClick={handleBuyNow}
+  //         className={`w-full py-2 border border-blue-600 text-blue-600 text-sm font-medium rounded-md bg-white ${isAdmin ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-50"
+  //           }`}
+  //         disabled={isAdmin}
+  //       >
+  //         Buy Now
+  //       </button>
+  //     </div>
+  //   </div>
+  // );
+
   return (
-    <div className="border border-gray-300 rounded-lg p-4 shadow-sm relative bg-white">
-      {/* Sale Badge */}
-      <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-        50% off
+    <div className="border border-gray-300 rounded-lg p-4 shadow-lg relative bg-gradient-to-br from-white to-gray-100 hover:shadow-xl transform transition-all duration-300">
+      {/* Product Image */}
+      <div className="relative w-full h-48 overflow-hidden rounded-lg">
+        <img
+          onClick={handleCardClick}
+          src={isHovered ? product.image2 : product.image}
+          alt={product.title}
+          className={`w-full h-full object-cover transition-transform duration-500 ease-in-out ${isHovered ? "scale-105 opacity-90" : "scale-100 opacity-100"
+            }`}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        />
       </div>
 
-      {/* Product Image */}
-      <img
-        onClick={handleCardClick}
-        src={product.image}
-        alt={product.title}
-        className="w-full h-48 object-cover rounded-md"
-      />
+      {/* Sale Badge */}
+      <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md animate-pulse">
+        50% off
+      </div>
 
       {/* Product Info */}
       <div className="mt-4">
         {/* Title Section: Fixed Height */}
-        <h3 className="text-sm font-medium text-gray-700 h-10 overflow-hidden">
+        <h3 className="text-sm font-medium text-gray-800 h-10 overflow-hidden">
           {product.title}
         </h3>
         {/* Pricing Section */}
@@ -145,18 +262,20 @@ const ProductCard = ({ product }) => {
           <span className="text-sm text-gray-400 line-through mr-2">
             Rs. {product.originalPrice}
           </span>
-          <span className="text-sm text-red-600 font-bold">
+          <span className="text-lg text-red-600 font-bold">
             Rs. {product.discountedPrice}
           </span>
         </div>
       </div>
 
       {/* Buttons Section */}
-      <div className="mt-4 flex space-x-4">
+      <div className="mt-6 flex space-x-3">
         {/* Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          className={`w-full py-2 border border-black text-black text-sm font-medium rounded-md bg-white ${isAdmin ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"
+          className={`w-full py-2 border border-black text-black text-sm font-medium rounded-md bg-white shadow-md transform transition-all duration-300 ${isAdmin
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-100 hover:-translate-y-1 hover:shadow-lg"
             }`}
           disabled={added || isAdmin}
         >
@@ -165,7 +284,7 @@ const ProductCard = ({ product }) => {
 
         {showLoginPrompt && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-md shadow-lg max-w-md text-center">
+            <div className="bg-white p-6 rounded-lg shadow-xl max-w-md text-center transform scale-105 transition-transform duration-300">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Login Required</h2>
               <p className="text-gray-600 mb-6">
                 Please log in to add items to your cart and continue shopping.
@@ -193,7 +312,9 @@ const ProductCard = ({ product }) => {
         {/* Buy Now Button */}
         <button
           onClick={handleBuyNow}
-          className={`w-full py-2 border border-blue-600 text-blue-600 text-sm font-medium rounded-md bg-white ${isAdmin ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-50"
+          className={`w-full py-2 border border-blue-600 text-blue-600 text-sm font-medium rounded-md bg-white shadow-md transform transition-all duration-300 ${isAdmin
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-blue-50 hover:-translate-y-1 hover:shadow-lg"
             }`}
           disabled={isAdmin}
         >
@@ -202,6 +323,8 @@ const ProductCard = ({ product }) => {
       </div>
     </div>
   );
+
+
 };
 
 export default ProductCard;

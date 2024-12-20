@@ -55,6 +55,7 @@ const CartPage = () => {
                 const userData = userDocSnap.data();
                 setUserRole(userData.role || "user"); // Set user role from Firestore
                 setProfilePic(userData.profilePic || "/default-profile.png"); // Set the profile picture from Firestore
+                window.location.reload(); // This will refresh the website
             } else {
                 // If the user document doesn't exist, create a new one
                 await setDoc(userDocRef, {
@@ -159,70 +160,87 @@ const CartPage = () => {
             </div>
         );
     }
-
+    
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 bg-white shadow-md rounded-lg p-4">
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Cart ({cart.length})</h2>
+        <div className="p-4 sm:p-6 bg-gradient-to-br from-gray-100 via-gray-50 to-white min-h-screen">
+            <div className="max-w-screen-lg mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                {/* Cart Section */}
+                <div className="lg:col-span-2 bg-white shadow-xl rounded-lg p-4 sm:p-6">
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 border-b pb-2 sm:pb-4">
+                        Cart ({cart.length})
+                    </h2>
 
-                    {/* Select All Radio Button */}
-                    <div className="flex items-center gap-2 mb-4">
+                    {/* Select All Checkbox */}
+                    <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                         <input
                             type="checkbox"
                             checked={selectAll}
                             onChange={handleSelectAll}
-                            className="h-5 w-5"
+                            className="h-4 w-4 sm:h-5 sm:w-5 accent-pink-500 cursor-pointer"
                         />
-                        <label className="text-sm md:text-base">Select All</label>
+                        <label className="text-sm sm:text-base font-medium text-gray-700">
+                            Select All
+                        </label>
                     </div>
 
                     {cart.length === 0 ? (
-                        <p className="text-lg text-gray-600">Your cart is empty.</p>
+                        <p className="text-base sm:text-lg text-gray-500 text-center">
+                            Your cart is empty.
+                        </p>
                     ) : (
-                        <ul className="space-y-4">
+                        <ul className="space-y-4 sm:space-y-6">
                             {cart.map((item) => (
-                                <li key={item.id} className="flex justify-between items-center border-b pb-4">
-                                    <div className="flex items-center gap-4">
+                                <li
+                                    key={item.id}
+                                    className="flex flex-col md:flex-row justify-between items-start md:items-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow duration-300"
+                                >
+                                    {/* Item Details */}
+                                    <div className="flex items-center gap-3 sm:gap-4 mb-4 md:mb-0">
                                         <img
                                             src={item.image || "/default-item.png"}
                                             alt={item.title}
-                                            className="w-16 h-16 object-cover rounded-lg"
+                                            className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 object-cover rounded-lg border border-gray-300"
                                         />
                                         <div>
-                                            <h3 className="text-sm md:text-lg font-medium text-gray-800">{item.title}</h3>
-                                            <p className="text-xs md:text-sm text-gray-600">
-                                                Price: Rs. {item.price} x {item.quantity || 1}
+                                            <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-800">
+                                                {item.title}
+                                            </h3>
+                                            <p className="text-xs sm:text-sm text-gray-600">
+                                                Rs. {item.price} x {item.quantity || 1}
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
+
+                                    {/* Actions */}
+                                    <div className="flex items-center gap-2 sm:gap-3">
                                         <input
                                             type="checkbox"
                                             checked={selectedItems.includes(item.id)}
                                             onChange={() => handleItemSelect(item.id)}
-                                            className="h-5 w-5"
+                                            className="h-4 w-4 sm:h-5 sm:w-5 accent-pink-500 cursor-pointer"
                                         />
                                         {loadingItem === item.id ? (
-                                            <div className="animate-spin border-2 border-blue-400 rounded-full w-5 h-5 border-t-transparent"></div>
+                                            <div className="animate-spin border-2 border-pink-500 rounded-full w-5 h-5 sm:w-6 sm:h-6 border-t-transparent"></div>
                                         ) : (
                                             <>
                                                 <button
                                                     onClick={() => handleQuantityChange(item.id, -1)}
-                                                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs md:text-sm"
+                                                    className="px-1 sm:px-2 py-1 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300 transition-all text-xs sm:text-sm"
                                                 >
                                                     -
                                                 </button>
-                                                <span className="text-xs md:text-sm">{item.quantity || 1}</span>
+                                                <span className="text-xs sm:text-sm md:text-base font-medium">
+                                                    {item.quantity || 1}
+                                                </span>
                                                 <button
                                                     onClick={() => handleQuantityChange(item.id, 1)}
-                                                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs md:text-sm"
+                                                    className="px-1 sm:px-2 py-1 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300 transition-all text-xs sm:text-sm"
                                                 >
                                                     +
                                                 </button>
                                                 <button
                                                     onClick={() => handleRemoveItem(item.id)}
-                                                    className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs md:text-sm"
+                                                    className="px-1 sm:px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all text-xs sm:text-sm"
                                                 >
                                                     Remove
                                                 </button>
@@ -235,45 +253,42 @@ const CartPage = () => {
                     )}
                 </div>
 
-                <div className="bg-white shadow-md rounded-lg p-4">
-                    <h2 className="text-lg font-bold text-gray-800 mb-4">Summary</h2>
-                    <p className="text-xs md:text-sm text-gray-600 mb-4">Total items: {selectedItems.length}</p>
-                    <p className="text-xl md:text-2xl text-gray-800 font-bold mb-4">Total: Rs. {totalPrice}</p>
-                    {/* <Link
-                        to="/checkout"
-                        state={{
-                            selectedItems: cart.filter((item) => selectedItems.includes(item.id)),
-                            totalAmount: totalPrice,
-                        }}
-                    >
-                        <button
-                            className={`w-full px-4 py-2 bg-pink-600 text-white font-bold rounded-md hover:bg-pink-700 disabled:bg-pink-300 disabled:cursor-not-allowed`}
-                            disabled={selectedItems.length === 0}
-                        >
-                            Checkout
-                        </button>
-                    </Link> */}
+                {/* Summary Section */}
+                <div className="bg-white shadow-xl rounded-lg p-4 sm:p-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 border-b pb-2 sm:pb-4">
+                        Summary
+                    </h2>
+                    <p className="text-base sm:text-lg text-gray-600 mb-4">
+                        Total items:{" "}
+                        <span className="font-semibold">{selectedItems.length}</span>
+                    </p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">
+                        Rs. {totalPrice}
+                    </p>
 
                     <Link
                         to="/checkout"
                         state={{
-                            selectedItems: cart.filter(item => selectedItems.includes(item.id)),
-                            productImage: cart.filter(item => selectedItems.includes(item.id)).map(item => item.image),
+                            selectedItems: cart.filter((item) => selectedItems.includes(item.id)),
+                            productImage: cart
+                                .filter((item) => selectedItems.includes(item.id))
+                                .map((item) => item.image),
                             totalAmount: totalPrice,
                         }}
                     >
                         <button
-                            className={`w-full px-4 py-2 bg-pink-600 text-white font-bold rounded-md hover:bg-pink-700 disabled:bg-pink-300 disabled:cursor-not-allowed`}
+                            className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform disabled:bg-gray-300 disabled:cursor-not-allowed"
                             disabled={selectedItems.length === 0}
                         >
                             Checkout
                         </button>
                     </Link>
-
                 </div>
             </div>
         </div>
     );
+
+
 };
 
 export default CartPage;

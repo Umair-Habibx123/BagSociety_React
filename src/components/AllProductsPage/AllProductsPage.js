@@ -51,38 +51,46 @@ const AllProductsPage = () => {
 
   return (
     <section className="py-12 px-6 bg-gray-50 w-full">
-      <div className="container mx-auto">
+      <div className="container mx-auto max-w-screen-xl">
         {/* Header */}
-        <h2 className="text-3xl font-semibold text-center mb-12 text-gray-800">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
           All Products
         </h2>
 
         {/* Loading Indicator */}
         {loading ? (
           <div className="flex justify-center items-center h-48">
-            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-purple-600"></div>
           </div>
         ) : (
           <>
             {/* Products Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
               {currentProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <div
+                  key={product.id}
+                  className="group transition-transform transform hover:scale-105 duration-300"
+                >
+                  <ProductCard product={product} />
+                </div>
               ))}
             </div>
 
             {/* Pagination Controls */}
-            <div className="mt-10 flex justify-center">
-              <nav>
-                <ul className="flex space-x-4">
+            <div className="mt-12 flex justify-center">
+              <nav aria-label="Pagination Navigation">
+                <ul className="flex flex-wrap justify-center gap-3 md:gap-4">
                   {/* Previous Page Button */}
                   <li>
                     <button
                       onClick={() => paginate(currentPage - 1)}
-                      className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-md transition-all duration-200 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      className={`px-5 py-3 md:px-6 md:py-3 rounded-full shadow-md transition-all duration-300 transform ${currentPage === 1
+                          ? "bg-gray-400 text-white cursor-not-allowed"
+                          : "bg-purple-600 text-white hover:scale-110 hover:bg-purple-700"
+                        }`}
                       disabled={currentPage === 1}
                     >
-                      Previous
+                      &#8592; Previous
                     </button>
                   </li>
 
@@ -91,11 +99,10 @@ const AllProductsPage = () => {
                     <li key={index}>
                       <button
                         onClick={() => paginate(index + 1)}
-                        className={`px-4 py-2 border-2 rounded-lg font-medium transition-colors duration-300 ${
-                          currentPage === index + 1
-                            ? "bg-gray-800 text-white border-gray-800"
-                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                        }`}
+                        className={`px-4 py-2 md:px-5 md:py-3 rounded-full font-semibold transition-all duration-300 transform ${currentPage === index + 1
+                            ? "bg-purple-600 text-white scale-110 shadow-lg"
+                            : "bg-white text-gray-700 border border-gray-300 hover:bg-purple-50 hover:shadow-md"
+                          }`}
                       >
                         {index + 1}
                       </button>
@@ -106,10 +113,13 @@ const AllProductsPage = () => {
                   <li>
                     <button
                       onClick={() => paginate(currentPage + 1)}
-                      className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-md transition-all duration-200 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      className={`px-5 py-3 md:px-6 md:py-3 rounded-full shadow-md transition-all duration-300 transform ${currentPage === totalPages
+                          ? "bg-gray-400 text-white cursor-not-allowed"
+                          : "bg-purple-600 text-white hover:scale-110 hover:bg-purple-700"
+                        }`}
                       disabled={currentPage === totalPages}
                     >
-                      Next
+                      Next &#8594;
                     </button>
                   </li>
                 </ul>
@@ -120,6 +130,7 @@ const AllProductsPage = () => {
       </div>
     </section>
   );
+
 };
 
 export default AllProductsPage;
