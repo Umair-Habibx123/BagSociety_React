@@ -4,14 +4,13 @@ const app = express();
 const cors = require("cors");
 const admin = require("firebase-admin");
 
-// Initialize Firebase Admin SDK
-const serviceAccount = require("./bagsociety-firebase-adminsdk-gy00r-497e191bf3.json"); // Replace with the correct path
+const serviceAccount = require("./bagsociety-firebase-adminsdk-gy00r-497e191bf3.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const db = admin.firestore();  // Use admin.firestore() instead of getFirestore()
+const db = admin.firestore();
 
 app.use(cors());
 app.use(express.json());
@@ -27,9 +26,9 @@ app.post("/delete-user", async (req, res) => {
   }
 
   try {
-    // Step 1: Delete Firestore documents
-    await db.collection("users").doc(email).delete();  // Correct method to delete a document
-    await db.collection("userCart").doc(email).delete();  // Correct method to delete a document
+
+    await db.collection("users").doc(email).delete();
+    await db.collection("userCart").doc(email).delete();
     console.log(`Firestore documents for ${email} deleted.`);
 
     // Step 2: Get the user from Firebase Auth and delete

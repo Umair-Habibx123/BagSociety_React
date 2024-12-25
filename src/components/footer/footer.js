@@ -56,11 +56,15 @@ const Footer = () => {
               <li className="hover:text-blue-400 transition duration-300">
                 <Link to="/contact-us">Contact Us</Link>
               </li>
-              <li className="hover:text-blue-400 transition duration-300 cursor-pointer">
-                Return & Refund Policy
+              <li className="hover:text-blue-400 transition duration-300">
+                <Link to="/return-policy"> Return & Refund Policy</Link>
               </li>
-              <li className="hover:text-blue-400 transition duration-300 cursor-pointer">About Us</li>
-              <li className="hover:text-blue-400 transition duration-300 cursor-pointer">Shipping Policy</li>
+              <li className="hover:text-blue-400 transition duration-300">
+                <Link to="/about-us">About Us</Link>
+              </li>
+              <li className="hover:text-blue-400 transition duration-300">
+                <Link to="/shipping-policy"> Shipping Policy</Link>
+              </li>
             </ul>
           </div>
         </div>

@@ -27,6 +27,9 @@ import ShowProducts from './components/AdminDashboard/ShowProducts';
 import AddNewProduct from './components/AdminDashboard/AddProduct';
 import ManageOrders from './components/AdminDashboard/ManageOrders';
 import OrderDetailPage from './components/AdminDashboard/OrderDetailPage';
+import ReturnsPolicy from './components/footer/return-refund-info';
+import ShippingPolicy from './components/footer/shipping-info';
+import AboutUs from './components/footer/aboutUs';
 
 // Component to scroll to the top
 function ScrollToTop() {
@@ -76,6 +79,11 @@ function App() {
 
             {/* Settings Page */}
             <Route path="/setting" element={<SettingsPage />} />
+
+            <Route path="/return-policy" element={<ReturnsPolicy />} />
+            <Route path="/shipping-policy" element={<ShippingPolicy />} />
+
+            <Route path="/about-us" element={<AboutUs />} />
 
             {/* User Profile Page */}
             <Route path="/viewProfile" element={<UserDetails />} />
