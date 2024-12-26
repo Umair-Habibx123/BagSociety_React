@@ -19,6 +19,42 @@ function Navbar() {
   const navRef = useRef(null); // Ref for entire navbar
   const dropdownRef = useRef(null); // Ref for dropdown container
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false); // Close the dropdown if clicked outside
+      }
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        !navRef.current.contains(event.target)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    }
+    const handleScroll = () => {
+      setIsDropdownOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("scroll", handleScroll);
+
+    // Add event listener when dropdown is open
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      // Cleanup the event listener on component unmount or when dropdown closes
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isDropdownOpen]);
+
+
+  const closeMenu = () => setIsOpen(false);
+
+
 
   const handleSignIn = async () => {
     try {
@@ -56,32 +92,6 @@ function Navbar() {
       console.error("Error logging in with Google:", error);
     }
   };
-
-  const closeMenu = () => setIsOpen(false);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        !navRef.current.contains(event.target)
-      ) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    const handleScroll = () => {
-      setIsDropdownOpen(false);
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
 
   // Listen for authentication state changes (check if the user is logged in or not)
@@ -124,9 +134,8 @@ function Navbar() {
           </Link>
         </div>
 
-
         {/* Hamburger Menu for Mobile */}
-        <div className="md:hidden ml-auto"> {/* Visible only on mobile screens */}
+        <div className="md:hidden ml-auto">
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="text-white focus:outline-none"
@@ -156,18 +165,25 @@ function Navbar() {
           </button>
         </div>
 
+        {/* Full-Screen Overlay */}
+        {isOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-25 z-10"
+            onClick={closeMenu}
+          />
+        )}
+
         {/* Profile Icon Mobile */}
         {user && (
-          <div className="md:hidden ml-4"> {/* Only visible on mobile */}
+          <div className="md:hidden ml-4">
             <img
               src={profilePic} // Profile pic for mobile
               alt="Profile"
               className="w-8 h-8 rounded-full cursor-pointer"
-              onClick={() => setIsDropdownOpen((prev) => !prev)} // Toggle the dropdown menu
+              onClick={() => setIsDropdownOpen((prev) => !prev)}
             />
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg text-black z-50">
-                {/* Mobile dropdown options */}
                 <Link to="/setting">
                   <button
                     className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
@@ -222,24 +238,25 @@ function Navbar() {
           </div>
         )}
 
-
         {/* Navigation Links */}
         <ul
-          className={`md:flex md:items-center md:justify-end pr-[7px] md:space-x-6 absolute md:static top-16 left-0 w-full bg-gray-800 md:bg-transparent z-10 md:z-auto transition-all duration-300 p-0 ${isOpen ? "block" : "hidden"
+          className={`md:flex md:items-center md:justify-end absolute md:static top-16 left-0 w-full bg-gray-800 md:bg-transparent z-20 transition-all duration-300 p-0 ${isOpen ? "block" : "hidden"
             } md:ml-auto md:mr-0 mx-auto text-center md:text-left`}
         >
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/"
-              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu}
+              className="block py-2 px-4 text-white hover:text-blue-400"
+              onClick={closeMenu}
             >
               Home
             </Link>
           </li>
-          <li onClick={closeMenu} className="border-b border-gray-700 md:border-none" >
+          <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/all-products"
               className="block py-2 px-4 text-white hover:text-blue-400"
+              onClick={closeMenu}
             >
               Products
             </Link>
@@ -247,7 +264,8 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/my-cart"
-              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu}
+              className="block py-2 px-4 text-white hover:text-blue-400"
+              onClick={closeMenu}
             >
               Cart
             </Link>
@@ -255,7 +273,8 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/contact-us"
-              className="block py-2 px-4 text-white hover:text-blue-400" onClick={closeMenu}
+              className="block py-2 px-4 text-white hover:text-blue-400"
+              onClick={closeMenu}
             >
               Contact
             </Link>
@@ -305,10 +324,10 @@ function Navbar() {
                   {userRole === "admin" && ( // Show Admin Dashboard for admins only
                     <Link to="/admin-dashboard">
                       <button onClick={() => {
-                      closeMenu();
-                      setIsDropdownOpen(false);
-                    }}
-                      className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
+                        closeMenu();
+                        setIsDropdownOpen(false);
+                      }}
+                        className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
                         Admin Dashboard
                       </button>
                     </Link>
@@ -341,7 +360,7 @@ function Navbar() {
           )}
         </div>
       </div>
-    </nav>
+    </nav >
   );
 }
 
