@@ -5,6 +5,7 @@ import { db } from "../../firebase"; // Your firebase configuration file
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { FaUserCircle } from 'react-icons/fa'; // Import a default user icon from react-icons
 import image1 from '../../assets/images/logo.png';
+import './Navbar.css';
 
 function Navbar() {
 
@@ -128,8 +129,9 @@ function Navbar() {
   }, [auth]);
 
   return (
-    <nav
-      className={`fixed top-0 left-0 w-full bg-gray-800 z-50 transition-transform duration-300 ${isHidden ? "-translate-y-full" : "translate-y-0"
+    // <nav className="bg-gray-800">
+     <nav
+      className={`navbar fixed top-0 left-0 w-full bg-gray-800 z-50 transition-transform duration-300 ${isHidden ? "-translate-y-full" : "translate-y-0"
         }`}
     >
       <div className="w-full px-4 py-4 flex justify-between items-center">

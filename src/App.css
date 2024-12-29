@@ -14,3 +14,7 @@
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow for more prominence */
   font-weight: bold; /* Making the icon bolder */
 }
+
+.main-content {
+  margin-top: 70px; /* Adjusted based on the navbar height */
+}

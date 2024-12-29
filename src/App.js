@@ -48,24 +48,17 @@ function App() {
     <UserProvider>
       <Router>
         <div>
-          <div>
-            <Navbar />
-            <Routes>
-              {/* Home Page */}
-              <Route path="/" element={
-                <>
-                  <Hero />
-                </>
-              } />
-            </Routes>
-            <ScrollToTop />
-          </div>
+          <Navbar />
+          <ScrollToTop />
+
+          <div className="main-content">
 
           {/* Routes for different pages */}
           <Routes>
             {/* Home Page */}
             <Route path="/" element={
               <>
+                <Hero />
                 <ProductsSection />
               </>
             } />
@@ -162,6 +155,7 @@ function App() {
             <Route path="/forbidden" element={<Forbidden />} />
 
           </Routes>
+          </div>
 
           <Footer />
 
