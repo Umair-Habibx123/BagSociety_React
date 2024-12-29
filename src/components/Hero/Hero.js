@@ -15,9 +15,11 @@ const Hero = () => {
     return () => clearInterval(interval);
   }, [images.length]);
 
+
   return (
-    <div className="relative w-full h-screen overflow-hidden">
-      {/* Image Slider with Smooth Animation */}
+    <div className="relative w-full h-screen -mt-16 overflow-hidden">
+      {/* Background Slider */}
+
       <div
         className="flex transition-transform duration-1000 ease-in-out"
         style={{
@@ -45,8 +47,10 @@ const Hero = () => {
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black opacity-40"></div>
 
+
       {/* Hero Text with Animation */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white px-6 animate-fadeIn">
+
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[40%] text-center text-white px-6 animate-fadeIn">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-lg">
           Find Your Perfect Handbag
         </h1>
@@ -66,15 +70,15 @@ const Hero = () => {
           <div
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`w-4 h-4 rounded-full cursor-pointer transition-all transform ${
-              index === currentIndex
-                ? 'bg-pink-500 scale-125'
-                : 'bg-gray-400 hover:bg-pink-400'
-            }`}
+            className={`w-4 h-4 rounded-full cursor-pointer transition-all transform ${index === currentIndex
+              ? 'bg-pink-500 scale-125'
+              : 'bg-gray-400 hover:bg-pink-400'
+              }`}
           ></div>
         ))}
       </div>
-    </div>
+
+    </div >
   );
 };
 

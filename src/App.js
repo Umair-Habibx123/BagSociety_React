@@ -48,16 +48,24 @@ function App() {
     <UserProvider>
       <Router>
         <div>
-          <Navbar />
-          {/* ScrollToTop component ensures page scrolls to the top on route change */}
-          <ScrollToTop />
+          <div>
+            <Navbar />
+            <Routes>
+              {/* Home Page */}
+              <Route path="/" element={
+                <>
+                  <Hero />
+                </>
+              } />
+            </Routes>
+            <ScrollToTop />
+          </div>
 
           {/* Routes for different pages */}
           <Routes>
             {/* Home Page */}
             <Route path="/" element={
               <>
-                <Hero />
                 <ProductsSection />
               </>
             } />

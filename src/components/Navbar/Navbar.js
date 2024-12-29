@@ -7,11 +7,14 @@ import { FaUserCircle } from 'react-icons/fa'; // Import a default user icon fro
 import image1 from '../../assets/images/logo.png';
 
 function Navbar() {
+
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null); // User state to manage logged-in user info
   const [profilePic, setProfilePic] = useState("/default-profile.png"); // Default profile picture
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // To toggle the dropdown visibility
   const [userRole, setUserRole] = useState("user"); // State to store the user's role
+  const [isHidden, setIsHidden] = useState(false);
+  const [prevScrollPos, setPrevScrollPos] = useState(window.pageYOffset);
 
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
@@ -23,6 +26,7 @@ function Navbar() {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false); // Close the dropdown if clicked outside
+        setIsOpen(false);
       }
       if (
         dropdownRef.current &&
@@ -33,7 +37,13 @@ function Navbar() {
       }
     }
     const handleScroll = () => {
+      const currentScrollPos = window.pageYOffset;
+      const isScrollingUp = prevScrollPos > currentScrollPos;
+
+      setIsHidden(!isScrollingUp && currentScrollPos > 50);
+      setPrevScrollPos(currentScrollPos);
       setIsDropdownOpen(false);
+      setIsOpen(false);
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -49,7 +59,7 @@ function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, prevScrollPos]);
 
 
   const closeMenu = () => setIsOpen(false);
@@ -118,7 +128,10 @@ function Navbar() {
   }, [auth]);
 
   return (
-    <nav className="bg-gray-800">
+    <nav
+      className={`fixed top-0 left-0 w-full bg-gray-800 z-50 transition-transform duration-300 ${isHidden ? "-translate-y-full" : "translate-y-0"
+        }`}
+    >
       <div className="w-full px-4 py-4 flex justify-between items-center">
         {/* Logo */}
         <div className="flex items-center whitespace-nowrap">
@@ -165,13 +178,15 @@ function Navbar() {
           </button>
         </div>
 
+
         {/* Full-Screen Overlay */}
         {isOpen && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-25 z-10"
+            className="fixed inset-0 bg-black bg-opacity-25 z-40"
             onClick={closeMenu}
           />
         )}
+
 
         {/* Profile Icon Mobile */}
         {user && (
@@ -282,7 +297,8 @@ function Navbar() {
         </ul>
 
         {/* Profile Icon outside the navigation list, not inside the hamburger menu */}
-        <div className="hidden md:flex md:items-center"> {/* Visible only on larger screens */}
+        {/* Visible only on larger screens */}
+        <div className="hidden md:flex md:items-center">
           {user ? (
             <div className="relative">
               <img
