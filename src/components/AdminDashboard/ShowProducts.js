@@ -83,12 +83,52 @@ function ShowProducts() {
     };
 
     // Delete product
+    // const handleDelete = async () => {
+    //     setDeleting(true);
+    //     try {
+    //         await deleteDoc(doc(db, "products", deleteConfirm));
+    //         setProducts((prev) => prev.filter((product) => product.id !== deleteConfirm));
+    //         setSuccessMessage("Product deleted successfully!");
+    //     } catch (err) {
+    //         console.error("Error deleting product:", err);
+    //     } finally {
+    //         setDeleting(false);
+    //         setDeleteConfirm(null);
+    //     }
+    // };
+
     const handleDelete = async () => {
         setDeleting(true);
         try {
+            // Delete the product from the "products" collection
             await deleteDoc(doc(db, "products", deleteConfirm));
+
+            // Remove the product from all user carts
+            const userCartCollection = collection(db, "userCart");
+            const userCartSnapshot = await getDocs(userCartCollection);
+
+            const batchUpdates = [];
+
+            userCartSnapshot.forEach(async (userDoc) => {
+                const userData = userDoc.data();
+
+                if (userData.items) {
+                    const updatedItems = userData.items.filter((item) => item.id !== deleteConfirm);
+
+                    // If the items array has been updated, create an update for this user's cart
+                    if (updatedItems.length !== userData.items.length) {
+                        const userCartRef = doc(db, "userCart", userDoc.id);
+                        batchUpdates.push(updateDoc(userCartRef, { items: updatedItems }));
+                    }
+                }
+            });
+
+            // Wait for all updates to complete
+            await Promise.all(batchUpdates);
+
+            // Update state and success message
             setProducts((prev) => prev.filter((product) => product.id !== deleteConfirm));
-            setSuccessMessage("Product deleted successfully!");
+            setSuccessMessage("Product deleted successfully from the store and all user carts!");
         } catch (err) {
             console.error("Error deleting product:", err);
         } finally {
@@ -96,6 +136,7 @@ function ShowProducts() {
             setDeleteConfirm(null);
         }
     };
+
 
     return (
         <div className="min-h-screen bg-gray-50 p-8">
