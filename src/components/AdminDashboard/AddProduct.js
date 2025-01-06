@@ -73,7 +73,7 @@ function AddProduct() {
         setError("");
         setSuccess("");
 
-        if (!formData.title || !formData.originalPrice || !formData.discountedPrice || !formData.image) {
+        if (!formData.title || !formData.originalPrice || !formData.discountedPrice || !formData.image || !formData.image2) {
             setError("Please input every field");
             setLoading(false);
             return;
@@ -91,11 +91,13 @@ function AddProduct() {
             await setDoc(newProductRef, formData);
 
             setSuccess(`Product added successfully with ID: ${nextDocName}`);
-            setFormData({
+            setFormData((prev) => ({
+                ...prev,
                 title: "",
                 originalPrice: "",
                 discountedPrice: "",
                 image: "",
+                image2: prev.image2, // Retain the default image2 value
                 details: {
                     clutchInside: "",
                     color: "",
@@ -106,7 +108,8 @@ function AddProduct() {
                     straps: "",
                     style: "",
                 },
-            });
+            }));
+
 
             setNextDocName(""); // Recalculate doc name for next product
         } catch (err) {
