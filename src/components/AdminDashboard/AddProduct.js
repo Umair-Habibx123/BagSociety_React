@@ -7,6 +7,7 @@ function AddProduct() {
         title: "",
         originalPrice: "",
         discountedPrice: "",
+        image2: "https://tse3.mm.bing.net/th?id=OIP.duOtADpRLa1w6xFJ3LFUdgHaI_&pid=ImgDet&w=474&h=575&rs=1",
         image: "",
         details: {
             clutchInside: "",
