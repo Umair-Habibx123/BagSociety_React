@@ -53,108 +53,108 @@ function App() {
 
           <div className="main-content">
 
-          {/* Routes for different pages */}
-          <Routes>
-            {/* Home Page */}
-            <Route path="/" element={
-              <>
-                <Hero />
-                <ProductsSection />
-              </>
-            } />
+            {/* Routes for different pages */}
+            <Routes>
+              {/* Home Page */}
+              <Route path="/" element={
+                <>
+                  <Hero />
+                  <ProductsSection />
+                </>
+              } />
 
-            {/* All Products Page */}
-            <Route path="/all-products" element={<AllProductsPage />} />
+              {/* All Products Page */}
+              <Route path="/all-products" element={<AllProductsPage />} />
 
-            {/* Product Detail Page */}
-            <Route path="/product/:id" element={<ProductDetail />} />
+              {/* Product Detail Page */}
+              <Route path="/product/:id" element={<ProductDetail />} />
 
-            {/* Cart Page */}
-            <Route path="/my-cart" element={<CartPage />} />
+              {/* Cart Page */}
+              <Route path="/my-cart" element={<CartPage />} />
 
-            {/* Contact Us Page */}
-            <Route path="/contact-us" element={<ContactUsForm />} />
+              {/* Contact Us Page */}
+              <Route path="/contact-us" element={<ContactUsForm />} />
 
-            {/* Checkout Page */}
-            <Route path="/checkout" element={<CheckoutPage />} />
+              {/* Checkout Page */}
+              <Route path="/checkout" element={<CheckoutPage />} />
 
-            {/* Settings Page */}
-            <Route path="/setting" element={<SettingsPage />} />
+              {/* Settings Page */}
+              <Route path="/setting" element={<SettingsPage />} />
 
-            <Route path="/return-policy" element={<ReturnsPolicy />} />
-            <Route path="/shipping-policy" element={<ShippingPolicy />} />
+              <Route path="/return-policy" element={<ReturnsPolicy />} />
+              <Route path="/shipping-policy" element={<ShippingPolicy />} />
 
-            <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/about-us" element={<AboutUs />} />
 
-            {/* User Profile Page */}
-            <Route path="/viewProfile" element={<UserDetails />} />
+              {/* User Profile Page */}
+              <Route path="/viewProfile" element={<UserDetails />} />
 
-            {/* Add Address Page */}
-            <Route path="/add-address" element={<AddAddressPage />} />
+              {/* Add Address Page */}
+              <Route path="/add-address" element={<AddAddressPage />} />
 
-            {/* Buy Now Page */}
-            <Route path="/BuyNow" element={<BuyNowPage />} />
+              {/* Buy Now Page */}
+              <Route path="/BuyNow" element={<BuyNowPage />} />
 
-            {/* My Orders Page */}
-            <Route path="/MyOrders" element={<MyOrdersPage />} />
+              {/* My Orders Page */}
+              <Route path="/MyOrders" element={<MyOrdersPage />} />
 
-            {/* Order Confirmation Page */}
-            <Route path="/order-confirmation" element={
-              <OrderConfirmationPage />
-            } />
+              {/* Order Confirmation Page */}
+              <Route path="/order-confirmation" element={
+                <OrderConfirmationPage />
+              } />
 
-            {/* Admin Dashboard and Related Routes */}
-            <Route path="/admin-dashboard/*" element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/admin-dashboard/showUsers" element={
-              <ProtectedRoute requiredRole="admin">
-                <ShowUsers />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/admin-dashboard/showProducts" element={
-              <ProtectedRoute requiredRole="admin">
-                <ShowProducts />
-              </ProtectedRoute>
-            } />
-
-            <Route
-              path="/admin-dashboard/manageOrders"
-              element={
+              {/* Admin Dashboard and Related Routes */}
+              <Route path="/admin-dashboard/*" element={
                 <ProtectedRoute requiredRole="admin">
-                  <ManageOrders />
+                  <AdminDashboard />
                 </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin-dashboard/manageOrders/:userId/:orderId"
-              element={
+              } />
+
+              <Route path="/admin-dashboard/showUsers" element={
                 <ProtectedRoute requiredRole="admin">
-                  <OrderDetailPage />
+                  <ShowUsers />
                 </ProtectedRoute>
-              }
-            />
+              } />
 
-            <Route path="/admin-dashboard/editUsers" element={
-              <ProtectedRoute requiredRole="admin">
-                <EditUsers />
-              </ProtectedRoute>
-            } />
+              <Route path="/admin-dashboard/showProducts" element={
+                <ProtectedRoute requiredRole="admin">
+                  <ShowProducts />
+                </ProtectedRoute>
+              } />
 
-            <Route path="/admin-dashboard/addNewProducts" element={
-              <ProtectedRoute requiredRole="admin">
-                <AddNewProduct />
-              </ProtectedRoute>
-            } />
+              <Route
+                path="/admin-dashboard/manageOrders"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <ManageOrders />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin-dashboard/manageOrders/:userId/:orderId"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <OrderDetailPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Catch-all for Forbidden access */}
-            <Route path="/forbidden" element={<Forbidden />} />
+              <Route path="/admin-dashboard/editUsers" element={
+                <ProtectedRoute requiredRole="admin">
+                  <EditUsers />
+                </ProtectedRoute>
+              } />
 
-          </Routes>
+              <Route path="/admin-dashboard/addNewProducts" element={
+                <ProtectedRoute requiredRole="admin">
+                  <AddNewProduct />
+                </ProtectedRoute>
+              } />
+
+              {/* Catch-all for Forbidden access */}
+              <Route path="/forbidden" element={<Forbidden />} />
+
+            </Routes>
           </div>
 
           <Footer />

@@ -65,8 +65,6 @@ function Navbar() {
 
   const closeMenu = () => setIsOpen(false);
 
-
-
   const handleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, provider); // Trigger Google sign-in
@@ -130,7 +128,7 @@ function Navbar() {
 
   return (
     // <nav className="bg-gray-800">
-     <nav
+    <nav
       className={`navbar fixed top-0 left-0 w-full bg-gray-800 z-50 transition-transform duration-300 ${isHidden ? "-translate-y-full" : "translate-y-0"
         }`}
     >

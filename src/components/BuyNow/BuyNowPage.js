@@ -4,7 +4,6 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useUser } from '../../context/UserContext';
-import emailjs from 'emailjs-com'; // Import emailjs
 
 
 const BuyNowPage = () => {

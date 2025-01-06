@@ -18,6 +18,11 @@ const OrderConfirmationPage = () => {
     };
 
 
+    const goBack = () => {
+        // Navigate to the home route
+        window.location.href = "/";
+    };
+
     return (
         <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
             <div
@@ -71,12 +76,27 @@ const OrderConfirmationPage = () => {
                 </div>
 
                 {/* Screenshot Button */}
-                <button
+                {/* <button
                     onClick={handleCaptureScreenshot}
                     className="mt-6 bg-blue-600 text-white p-3 sm:p-4 rounded-lg w-full sm:w-auto text-center transform hover:scale-105 transition-all duration-300"
                 >
                     Capture Screenshot
-                </button>
+                </button> */}
+                {/* Buttons Section */}
+                <div className="mt-6 flex flex-col sm:flex-row sm:justify-between space-y-4 sm:space-y-0">
+                    <button
+                        onClick={handleCaptureScreenshot}
+                        className="bg-blue-600 text-white p-3 sm:p-4 rounded-lg w-full sm:w-auto text-center transform hover:scale-105 transition-all duration-300"
+                    >
+                        Capture Screenshot
+                    </button>
+                    <button
+                        onClick={goBack}
+                        className="bg-gray-600 text-white p-3 sm:p-4 rounded-lg w-full sm:w-auto text-center transform hover:scale-105 transition-all duration-300"
+                    >
+                        Go Back
+                    </button>
+                </div>
             </div>
         </div>
     );

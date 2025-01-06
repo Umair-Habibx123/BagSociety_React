@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc, collection } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -15,6 +15,7 @@ const CheckoutPage = () => {
     };
     const [subtotal, setSubtotal] = useState(0);
     // const [shippingFee, setShippingFee] = useState(1.99);
+    const [userEmail, setUserEmail] = useState(null);
     const [total, setTotal] = useState(totalAmount || 0);
     const [address, setAddress] = useState(null);
     const [isAddressLoading, setIsAddressLoading] = useState(true);
@@ -224,17 +225,18 @@ const CheckoutPage = () => {
                 subtotal: subtotal.toFixed(2),
                 total: total.toFixed(2),
                 payment_method: paymentMethod,
+                from_name: userEmail, // Add the user's email
             };
 
             console.log("Email variables being passed to EmailJS:", emailVariables); // Log to check if order_details has valid HTML
 
             // Send confirmation email
-            // await emailjs.send(
-            //     "service_wng6lvv", // Replace with your service ID
-            //     "template_zmbrbjb", // Replace with your template ID
-            //     emailVariables,
-            //     "kkvWuOpN6HHfFs475" // Replace with your EmailJS user ID
-            // );
+            await emailjs.send(
+                "service_wng6lvv", // Replace with your service ID
+                "template_zmbrbjb", // Replace with your template ID
+                emailVariables,
+                "kkvWuOpN6HHfFs475" // Replace with your EmailJS user ID
+            );
 
             alert("Order placed successfully!");
 
@@ -247,9 +249,6 @@ const CheckoutPage = () => {
             setIsLoading(false); // Stop loading after the checkout process completes
         }
     };
-
-
-
 
     const saveOrderToFirestore = async (userEmail, orderData) => {
         try {
