@@ -14,6 +14,7 @@ const ProductCard = ({ product }) => {
   const [userState, setUserState] = useState(null); // User state to manage logged-in user info
   const [userRole, setUserRole] = useState("user"); // State to store the user's role
   const [isHovered, setIsHovered] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
 
   const handleMouseEnter = () => setIsHovered(true);
   const handleMouseLeave = () => setIsHovered(false);
@@ -48,6 +49,7 @@ const ProductCard = ({ product }) => {
       return;
     }
 
+    setIsLoading(true); // Set loading state to true
     try {
       const cartRef = doc(db, "userCart", userContext.email);
       const cartDoc = await getDoc(cartRef);
@@ -77,8 +79,12 @@ const ProductCard = ({ product }) => {
       await setDoc(cartRef, { items: updatedCart });
 
       setAdded(true);
+      setTimeout(() => setAdded(false), 3000); // Hide after 3 seconds
     } catch (error) {
       console.error("Error adding to cart: ", error);
+    }
+    finally {
+      setIsLoading(false); // Reset loading state
     }
   };
 
@@ -153,6 +159,8 @@ const ProductCard = ({ product }) => {
         />
       </div>
 
+
+
       {/* Sale Badge */}
       <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md animate-pulse">
         50% off
@@ -160,11 +168,9 @@ const ProductCard = ({ product }) => {
 
       {/* Product Info */}
       <div className="mt-4">
-        {/* Title Section: Fixed Height */}
         <h3 className="text-sm font-medium text-gray-800 h-10 overflow-hidden">
           {product.title}
         </h3>
-        {/* Pricing Section */}
         <div className="flex items-center mt-2">
           <span className="text-sm text-gray-400 line-through mr-2">
             Rs. {product.originalPrice}
@@ -178,16 +184,65 @@ const ProductCard = ({ product }) => {
       {/* Buttons Section */}
       <div className="mt-6 flex space-x-3">
         {/* Add to Cart Button */}
+
         <button
           onClick={handleAddToCart}
           className={`w-full py-2 border border-black text-black text-sm font-medium rounded-md bg-white shadow-md transform transition-all duration-300 ${isAdmin
             ? "opacity-50 cursor-not-allowed"
             : "hover:bg-gray-100 hover:-translate-y-1 hover:shadow-lg"
             }`}
-          disabled={added || isAdmin}
+          disabled={isLoading || added || isAdmin}
         >
-          {added ? "Added to Cart" : "Add to Cart"}
+          {isLoading ? (
+            <span className="flex items-center justify-center space-x-2">
+              <svg
+                className="animate-spin h-5 w-5 text-gray-600"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C6.477 0 0 6.477 0 12h4zm2 5.291A7.967 7.967 0 014 12H0c0 2.137.837 4.09 2.209 5.526l1.791-1.235z"
+                ></path>
+              </svg>
+              <span>Adding...</span>
+            </span>
+          ) : added ? (
+            "Added to Cart"
+          ) : (
+            "Add to Cart"
+          )}
         </button>
+
+        {added && (
+          <div className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 flex items-center bg-green-500 text-white px-4 py-2 rounded shadow-lg">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2l4-4m0-6a9 9 0 110 18a9 9 0 010-18z"
+              />
+            </svg>
+            <span>Product added to cart successfully!</span>
+          </div>
+        )}
 
         {showLoginPrompt && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
