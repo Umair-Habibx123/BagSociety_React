@@ -30,6 +30,7 @@ import OrderDetailPage from './components/AdminDashboard/OrderDetailPage';
 import ReturnsPolicy from './components/footer/return-refund-info';
 import ShippingPolicy from './components/footer/shipping-info';
 import AboutUs from './components/footer/aboutUs';
+import GoogleAdSense from "./components/AddSence"; // Import the AdSense component
 
 // Component to scroll to the top
 function ScrollToTop() {
@@ -52,6 +53,9 @@ function App() {
           <ScrollToTop />
 
           <div className="main-content">
+
+            {/* AdSense at the top of the main content */}
+            {/* <GoogleAdSense /> */}
 
             {/* Routes for different pages */}
             <Routes>
