@@ -1,3 +1,35 @@
-# https://www.robotstxt.org/robotstxt.html
+# Allow all user agents (search engines) to crawl the entire website
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /my-cart/
+Disallow: /order-confirmation/
+Disallow: /user-profile/
+
+# Allow crawling of all other content (default for User-agent: *)
+Allow: /
+
+# Sitemap file location for search engines
+Sitemap: https://bagsociety.vercel.app/sitemap.xml
+
+# Prevent index of certain dynamic or sensitive content
+Disallow: /cart/
+Disallow: /login/
+Disallow: /register/
+
+# Optionally, you can disallow certain file types like images or PDFs
+Disallow: /*.pdf$
+Disallow: /*.jpg$
+Disallow: /*.png$
+
+# Block specific crawlers if necessary (optional)
+User-agent: BadBot
+Disallow: /
+
+# Allow all bots to access all URLs except those in the above sections
+User-agent: Googlebot
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /my-cart/
+
+Sitemap: https://bagsociety.vercel.app/sitemap.xml

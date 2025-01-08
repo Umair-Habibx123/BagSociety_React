@@ -30,7 +30,9 @@ import OrderDetailPage from './components/AdminDashboard/OrderDetailPage';
 import ReturnsPolicy from './components/footer/return-refund-info';
 import ShippingPolicy from './components/footer/shipping-info';
 import AboutUs from './components/footer/aboutUs';
+import PageNotFound from './components/PageNotFound/PageNotFound';
 import GoogleAdSense from "./components/AddSence"; // Import the AdSense component
+import { HelmetProvider, Helmet } from 'react-helmet-async';  // Import Helmet
 
 // Component to scroll to the top
 function ScrollToTop() {
@@ -46,137 +48,158 @@ function ScrollToTop() {
 
 function App() {
   return (
-    <UserProvider>
-      <Router>
-        <div>
-          <Navbar />
-          <ScrollToTop />
+    <HelmetProvider>
+      <UserProvider>
+        <Router>
+          <div>
+            <Navbar />
+            <ScrollToTop />
 
-          <div className="main-content">
+            <div className="main-content">
 
-            {/* AdSense at the top of the main content */}
-            {/* <GoogleAdSense /> */}
+              {/* SEO metadata for the entire page */}
+              <Helmet>
+                <meta charSet="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>My E-Commerce Website</title>
+                <meta name="description" content="Shop the best products at My E-Commerce Website. Get the latest deals and offers!" />
+                <meta name="keywords" content="e-commerce, online shopping, products, best deals" />
+                <meta name="author" content="My E-Commerce Website" />
+                <meta property="og:title" content="My E-Commerce Website" />
+                <meta property="og:description" content="Shop the best products at My E-Commerce Website. Get the latest deals and offers!" />
+                <meta property="og:image" content="https://example.com/og-image.jpg" />
+                <meta property="og:url" content="https://example.com" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="My E-Commerce Website" />
+                <meta name="twitter:description" content="Shop the best products at My E-Commerce Website. Get the latest deals and offers!" />
+                <meta name="twitter:image" content="https://example.com/twitter-image.jpg" />
+              </Helmet>
 
-            {/* Routes for different pages */}
-            <Routes>
-              {/* Home Page */}
-              <Route path="/" element={
-                <>
-                  <Hero />
-                  <ProductsSection />
-                </>
-              } />
+              {/* AdSense at the top of the main content */}
+              {/* <GoogleAdSense /> */}
 
-              {/* All Products Page */}
-              <Route path="/all-products" element={<AllProductsPage />} />
+              {/* Routes for different pages */}
+              <Routes>
+                {/* Home Page */}
+                <Route path="/" element={
+                  <>
+                    <Hero />
+                    <ProductsSection />
+                  </>
+                } />
 
-              {/* Product Detail Page */}
-              <Route path="/product/:id" element={<ProductDetail />} />
+                {/* All Products Page */}
+                <Route path="/all-products" element={<AllProductsPage />} />
 
-              {/* Cart Page */}
-              <Route path="/my-cart" element={<CartPage />} />
+                {/* Product Detail Page */}
+                <Route path="/product/:id" element={<ProductDetail />} />
 
-              {/* Contact Us Page */}
-              <Route path="/contact-us" element={<ContactUsForm />} />
+                {/* Cart Page */}
+                <Route path="/my-cart" element={<CartPage />} />
 
-              {/* Checkout Page */}
-              <Route path="/checkout" element={<CheckoutPage />} />
+                {/* Contact Us Page */}
+                <Route path="/contact-us" element={<ContactUsForm />} />
 
-              {/* Settings Page */}
-              <Route path="/setting" element={<SettingsPage />} />
+                {/* Checkout Page */}
+                <Route path="/checkout" element={<CheckoutPage />} />
 
-              <Route path="/return-policy" element={<ReturnsPolicy />} />
-              <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                {/* Settings Page */}
+                <Route path="/setting" element={<SettingsPage />} />
 
-              <Route path="/about-us" element={<AboutUs />} />
+                <Route path="/return-policy" element={<ReturnsPolicy />} />
+                <Route path="/shipping-policy" element={<ShippingPolicy />} />
 
-              {/* User Profile Page */}
-              <Route path="/viewProfile" element={<UserDetails />} />
+                <Route path="/about-us" element={<AboutUs />} />
 
-              {/* Add Address Page */}
-              <Route path="/add-address" element={<AddAddressPage />} />
+                {/* User Profile Page */}
+                <Route path="/viewProfile" element={<UserDetails />} />
 
-              {/* Buy Now Page */}
-              <Route path="/BuyNow" element={<BuyNowPage />} />
+                {/* Add Address Page */}
+                <Route path="/add-address" element={<AddAddressPage />} />
 
-              {/* My Orders Page */}
-              <Route path="/MyOrders" element={<MyOrdersPage />} />
+                {/* Buy Now Page */}
+                <Route path="/BuyNow" element={<BuyNowPage />} />
 
-              {/* Order Confirmation Page */}
-              <Route path="/order-confirmation" element={
-                <OrderConfirmationPage />
-              } />
+                {/* My Orders Page */}
+                <Route path="/MyOrders" element={<MyOrdersPage />} />
 
-              {/* Admin Dashboard and Related Routes */}
-              <Route path="/admin-dashboard/*" element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } />
+                {/* Order Confirmation Page */}
+                <Route path="/order-confirmation" element={
+                  <OrderConfirmationPage />
+                } />
 
-              <Route path="/admin-dashboard/showUsers" element={
-                <ProtectedRoute requiredRole="admin">
-                  <ShowUsers />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/admin-dashboard/showProducts" element={
-                <ProtectedRoute requiredRole="admin">
-                  <ShowProducts />
-                </ProtectedRoute>
-              } />
-
-              <Route
-                path="/admin-dashboard/manageOrders"
-                element={
+                {/* Admin Dashboard and Related Routes */}
+                <Route path="/admin-dashboard/*" element={
                   <ProtectedRoute requiredRole="admin">
-                    <ManageOrders />
+                    <AdminDashboard />
                   </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin-dashboard/manageOrders/:userId/:orderId"
-                element={
+                } />
+
+                <Route path="/admin-dashboard/showUsers" element={
                   <ProtectedRoute requiredRole="admin">
-                    <OrderDetailPage />
+                    <ShowUsers />
                   </ProtectedRoute>
-                }
-              />
+                } />
 
-              <Route path="/admin-dashboard/editUsers" element={
-                <ProtectedRoute requiredRole="admin">
-                  <EditUsers />
-                </ProtectedRoute>
-              } />
+                <Route path="/admin-dashboard/showProducts" element={
+                  <ProtectedRoute requiredRole="admin">
+                    <ShowProducts />
+                  </ProtectedRoute>
+                } />
 
-              <Route path="/admin-dashboard/addNewProducts" element={
-                <ProtectedRoute requiredRole="admin">
-                  <AddNewProduct />
-                </ProtectedRoute>
-              } />
+                <Route
+                  path="/admin-dashboard/manageOrders"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <ManageOrders />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin-dashboard/manageOrders/:userId/:orderId"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <OrderDetailPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Catch-all for Forbidden access */}
-              <Route path="/forbidden" element={<Forbidden />} />
+                <Route path="/admin-dashboard/editUsers" element={
+                  <ProtectedRoute requiredRole="admin">
+                    <EditUsers />
+                  </ProtectedRoute>
+                } />
 
-            </Routes>
+                <Route path="/admin-dashboard/addNewProducts" element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AddNewProduct />
+                  </ProtectedRoute>
+                } />
+
+                {/* Catch-all for Forbidden access */}
+                <Route path="/forbidden" element={<Forbidden />} />
+                {/* Catch-all for non-matching routes */}
+                <Route path="*" element={<PageNotFound />} />
+              </Routes>
+            </div>
+
+            <Footer />
+
+            {/* WhatsApp Icon */}
+            <div className="whatsapp-icon">
+              <a
+                href="https://wa.me/+923108026280"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out"
+              >
+                <FaWhatsapp className="text-2xl" />
+              </a>
+            </div>
           </div>
-
-          <Footer />
-
-          {/* WhatsApp Icon */}
-          <div className="whatsapp-icon">
-            <a
-              href="https://wa.me/+923108026280"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out"
-            >
-              <FaWhatsapp className="text-2xl" />
-            </a>
-          </div>
-        </div>
-      </Router>
-    </UserProvider>
+        </Router>
+      </UserProvider>
+    </HelmetProvider>
   );
 }
 
