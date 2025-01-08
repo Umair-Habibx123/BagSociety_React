@@ -61,19 +61,20 @@ function App() {
               <Helmet>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>My E-Commerce Website</title>
-                <meta name="description" content="Shop the best products at My E-Commerce Website. Get the latest deals and offers!" />
-                <meta name="keywords" content="e-commerce, online shopping, products, best deals" />
-                <meta name="author" content="My E-Commerce Website" />
-                <meta property="og:title" content="My E-Commerce Website" />
-                <meta property="og:description" content="Shop the best products at My E-Commerce Website. Get the latest deals and offers!" />
+                <title>Bag Society - Women’s Handbags Online Store</title>
+                <meta name="description" content="Discover a wide range of stylish and high-quality handbags for women at Bag Society. Shop for the latest trends in women's fashion bags, purses, and more!" />
+                <meta name="keywords" content="women's handbags, women's purses, online shopping, fashion bags, stylish handbags, handbags for women" />
+                <meta name="author" content="Bag Society" />
+                <meta property="og:title" content="Bag Society - Women’s Handbags Online Store" />
+                <meta property="og:description" content="Discover a wide range of stylish and high-quality handbags for women at Bag Society. Shop for the latest trends in women's fashion bags, purses, and more!" />
                 <meta property="og:image" content="https://example.com/og-image.jpg" />
-                <meta property="og:url" content="https://example.com" />
+                <meta property="og:url" content="https://bagsociety.vercel.app" />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="My E-Commerce Website" />
-                <meta name="twitter:description" content="Shop the best products at My E-Commerce Website. Get the latest deals and offers!" />
+                <meta name="twitter:title" content="Bag Society - Women’s Handbags Online Store" />
+                <meta name="twitter:description" content="Discover a wide range of stylish and high-quality handbags for women at Bag Society. Shop for the latest trends in women's fashion bags, purses, and more!" />
                 <meta name="twitter:image" content="https://example.com/twitter-image.jpg" />
               </Helmet>
+
 
               {/* AdSense at the top of the main content */}
               {/* <GoogleAdSense /> */}
