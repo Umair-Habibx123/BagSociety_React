@@ -55,7 +55,9 @@ const ProductsSection = () => {
               key={product.id}
               className="group relative transition-transform transform hover:scale-105 duration-300"
             >
+              {/* <div className="w-full h-64 sm:h-64 lg:h-auto aspect-w-1 aspect-h-1"> */}
               <ProductCard product={product} />
+              {/* </div> */}
             </div>
           ))}
         </div>

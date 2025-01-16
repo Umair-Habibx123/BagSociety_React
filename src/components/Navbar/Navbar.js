@@ -127,7 +127,6 @@ function Navbar() {
   }, [auth]);
 
   return (
-    // <nav className="bg-gray-800">
     <nav
       className={`navbar fixed top-0 left-0 w-full bg-gray-800 z-50 transition-transform duration-300 ${isHidden ? "-translate-y-full" : "translate-y-0"
         }`}
@@ -178,14 +177,157 @@ function Navbar() {
           </button>
         </div>
 
-
-        {/* Full-Screen Overlay */}
-        {isOpen && (
+        {/* Sidebar */}
+        {/*  <div>
           <div
-            className="fixed inset-0 bg-black bg-opacity-25 z-40"
-            onClick={closeMenu}
-          />
-        )}
+            className={`fixed top-0 left-0 h-full w-64 bg-white z-50 transform transition-transform duration-300 shadow-lg ${isOpen ? 'translate-x-0' : '-translate-x-full'
+              }`}
+          >
+            <div className="pt-6 pr-6 pb-4 pl-6 flex justify-between items-center border-b border-gray-300">
+              <span className="text-black text-xl font-semibold">Menu</span>
+              <button
+                onClick={closeMenu}
+                className="text-black hover:text-gray-600 focus:outline-none transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <ul className="text-black bg-white">
+              <li className="border-b border-gray-300">
+                <Link
+                  to="/"
+                  className="block py-4 px-6 hover:bg-gray-100 transition-colors"
+                  onClick={closeMenu}
+                >
+                  <span className="flex items-center gap-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 12h18M12 3v18"
+                      />
+                    </svg>
+                    Home
+                  </span>
+                </Link>
+              </li>
+              <li className="border-b border-gray-300">
+                <Link
+                  to="/all-products"
+                  className="block py-4 px-6 hover:bg-gray-100 transition-colors"
+                  onClick={closeMenu}
+                >
+                  <span className="flex items-center gap-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 12h14m-7-7v14"
+                      />
+                    </svg>
+                    Products
+                  </span>
+                </Link>
+              </li>
+              <li className="border-b border-gray-300">
+                <Link
+                  to="/my-cart"
+                  className="block py-4 px-6 hover:bg-gray-100 transition-colors"
+                  onClick={closeMenu}
+                >
+                  <span className="flex items-center gap-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 3h18M9 22l3-7 3 7M6 6l6 6-6 6M18 6l-6 6 6 6"
+                      />
+                    </svg>
+                    Cart
+                  </span>
+                </Link>
+              </li>
+              <li className="border-b border-gray-300">
+                <Link
+                  to="/contact-us"
+                  className="block py-4 px-6 hover:bg-gray-100 transition-colors"
+                  onClick={closeMenu}
+                >
+                  <span className="flex items-center gap-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8 6h8M8 12h4m-2 6h6"
+                      />
+                    </svg>
+                    Contact
+                  </span>
+                </Link>
+              </li>
+            </ul>
+          </div>
+        <button
+          onClick={closeMenu}
+          className="fixed top-4 left-4 text-black hover:text-gray-600 focus:outline-none transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16m-7 6h7"
+            />
+          </svg>
+        </button>
+      </div> */}
 
 
         {/* Profile Icon Mobile */}
@@ -254,14 +396,15 @@ function Navbar() {
         )}
 
         {/* Navigation Links */}
+
         <ul
-          className={`md:flex md:items-center md:justify-end absolute md:static top-16 left-0 w-full bg-gray-800 md:bg-transparent z-20 transition-all duration-300 p-0 ${isOpen ? "block" : "hidden"
-            } md:ml-auto md:mr-0 mx-auto text-center md:text-left`}
+          className={`md:flex md:items-center md:justify-end absolute md:static top-16 left-0 w-full bg-gray-800 md:bg-transparent z-20 transition-all duration-300 ease-in-out p-0 
+    ${isOpen ? "block" : "hidden"} md:ml-auto md:mr-0 mx-auto text-center md:text-left`}
         >
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/"
-              className="block py-2 px-4 text-white hover:text-blue-400"
+              className="block py-3 px-6 text-white hover:bg-white hover:text-black hover:shadow-md rounded-full transition-all duration-300 ease-in-out transform hover:scale-105"
               onClick={closeMenu}
             >
               Home
@@ -270,7 +413,7 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/all-products"
-              className="block py-2 px-4 text-white hover:text-blue-400"
+              className="block py-3 px-6 text-white hover:bg-white hover:text-black hover:shadow-md rounded-full transition-all duration-300 ease-in-out transform hover:scale-105"
               onClick={closeMenu}
             >
               Products
@@ -279,7 +422,7 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/my-cart"
-              className="block py-2 px-4 text-white hover:text-blue-400"
+              className="block py-3 px-6 text-white hover:bg-white hover:text-black hover:shadow-md rounded-full transition-all duration-300 ease-in-out transform hover:scale-105"
               onClick={closeMenu}
             >
               Cart
@@ -288,13 +431,14 @@ function Navbar() {
           <li className="border-b border-gray-700 md:border-none">
             <Link
               to="/contact-us"
-              className="block py-2 px-4 text-white hover:text-blue-400"
+              className="block py-3 px-6 text-white hover:bg-white hover:text-black hover:shadow-md rounded-full transition-all duration-300 ease-in-out transform hover:scale-105"
               onClick={closeMenu}
             >
               Contact
             </Link>
           </li>
         </ul>
+
 
         {/* Profile Icon outside the navigation list, not inside the hamburger menu */}
         {/* Visible only on larger screens */}
@@ -304,10 +448,11 @@ function Navbar() {
               <img
                 src={profilePic} // Use the profile picture fetched from Firestore
                 alt="Profile"
-                className="w-12 h-10 rounded-full cursor-pointer"
-                // onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle the dropdown menu
+                className="w-12 h-10 rounded-full cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-110 hover:shadow-lg hover:ring-2 hover:ring-blue-400"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
               />
+
+
               {/* Dropdown Menu for Profile */}
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg text-black z-50">
@@ -318,7 +463,8 @@ function Navbar() {
                       closeMenu();
                       setIsDropdownOpen(false);
                     }}
-                      className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
+                      className="block w-full px-4 py-2 text-sm text-left rounded-md transition-all duration-300 ease-in-out hover:bg-blue-500 hover:text-white hover:shadow-md transform hover:scale-105"
+
                     >
                       View Profile
                     </button>
@@ -331,7 +477,8 @@ function Navbar() {
                       closeMenu();
                       setIsDropdownOpen(false);
                     }}
-                      className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
+                      className="block w-full px-4 py-2 text-sm text-left rounded-md transition-all duration-300 ease-in-out hover:bg-blue-500 hover:text-white hover:shadow-md transform hover:scale-105"
+
                     >
                       My Orders
                     </button>
@@ -343,7 +490,8 @@ function Navbar() {
                         closeMenu();
                         setIsDropdownOpen(false);
                       }}
-                        className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100">
+                        className="block w-full px-4 py-2 text-sm text-left rounded-md transition-all duration-300 ease-in-out hover:bg-blue-500 hover:text-white hover:shadow-md transform hover:scale-105"
+                      >
                         Admin Dashboard
                       </button>
                     </Link>
@@ -358,7 +506,8 @@ function Navbar() {
                       closeMenu();
                       window.location.reload(); // Refresh the page to clear any remaining data
                     }}
-                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
+                    className="block w-full px-4 py-2 text-sm text-left rounded-md transition-all duration-300 ease-in-out hover:bg-blue-500 hover:text-white hover:shadow-md transform hover:scale-105"
+
                   >
                     Logout
                   </button>
