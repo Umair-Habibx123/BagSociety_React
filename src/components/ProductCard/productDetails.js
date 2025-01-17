@@ -5,6 +5,8 @@ import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebas
 import { auth } from "../../firebase"; // Make sure the path is correct
 import { useUser } from "../../context/UserContext"; // Assuming you have a context for the user
 import { db } from "../../firebase"; // Ensure this path is correct
+import { collection, getDocs } from "firebase/firestore";
+import ProductCard from "./ProductCard";
 
 const ProductDetail = () => {
     const { id: productId } = useParams(); // Extract `id` from URL params and rename it as `productId`
@@ -19,8 +21,40 @@ const ProductDetail = () => {
     const navigate = useNavigate(); // To navigate to other pages
     const [profilePic, setProfilePic] = useState("/default-profile.png");
     const [user, setUser] = useState(null); // User state to manage logged-in user info
+    const [products, setProducts] = useState([]);
 
     const provider = new GoogleAuthProvider();
+
+    // Fetch products from Firestore
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const productsSnapshot = await getDocs(collection(db, "products"));
+                const productsList = productsSnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+
+
+                // Sort products descending based on the document ID in descending order (e.g., product10, product9, ..., product1)
+                const sortedProducts = productsList.sort((a, b) => {
+                    const idA = a.id.replace(/[^0-9]/g, ''); // Extract the numeric part of the ID
+                    const idB = b.id.replace(/[^0-9]/g, ''); // Extract the numeric part of the ID
+                    return parseInt(idB) - parseInt(idA); // Sort in descending order
+                });
+
+                setProducts(sortedProducts); // Set the sorted products state
+            }
+
+            catch (error) {
+                console.error("Error fetching products: ", error);
+            }
+        };
+
+        fetchProducts();
+    }, []);
+    // Slice to only show the first 5 products
+    const firstFiveProducts = products.slice(0, 5);
 
 
     useEffect(() => {
@@ -138,7 +172,10 @@ const ProductDetail = () => {
         }
     };
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return (
+        <div className="flex items-center justify-center h-screen">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-pink-500 border-opacity-75"></div>
+        </div>)
     if (error) return <p>{error}</p>;
 
     // Destructure product details safely, with defaults
@@ -303,6 +340,36 @@ const ProductDetail = () => {
                     Actual colors of the product may vary from the colors being displayed on your device.
                 </p>
             </div>
+
+            <section className="bg-gray-50 py-12 mt-12">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Section Header */}
+                    <div className="text-center mb-10">
+                        <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">
+                            More Products You'll Love
+                        </h2>
+                        <p className="text-gray-600 mt-2 text-sm sm:text-base max-w-xl mx-auto">
+                            Browse through our curated collection of amazing products.
+                        </p>
+                    </div>
+
+                    {/* Products Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 animate__animated animate__fadeInUp">
+                        {firstFiveProducts.map((product) => (
+                            <div
+                                key={product.id}
+                                className="group relative transition-transform transform hover:scale-105 duration-300"
+                            >
+                                {/* <div className="w-full h-64 sm:h-64 lg:h-auto aspect-w-1 aspect-h-1"> */}
+                                <ProductCard product={product} />
+                                {/* </div> */}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+
 
             {/* Login Prompt Modal */}
             {showLoginPrompt && (
